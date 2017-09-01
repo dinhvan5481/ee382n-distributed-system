@@ -11,18 +11,18 @@ import java.util.stream.Collectors;
  * Created by dinhvan5481 on 8/29/17.
  */
 public class OnlineStore {
-    private HashMap<Integer, StoreItem> iventory;
+    private HashMap<Integer, StoreItem> inventory;
     private ConcurrentHashMap<Integer, StoreOrder> orders;
     private AtomicInteger storeOrderId;
 
     public OnlineStore() {
-        iventory = new HashMap<Integer, StoreItem>();
+        inventory = new HashMap<Integer, StoreItem>();
         orders = new ConcurrentHashMap<Integer, StoreOrder>();
         storeOrderId = new AtomicInteger(0);
     }
 
     public String placeOrder(String username, String itemName, int qty) {
-        if(!this.iventory.containsKey(itemName.hashCode())) {
+        if(!this.inventory.containsKey(itemName.hashCode())) {
             return "`Not Available - We do not sell this product";
         }
         StoreItem purchasedItem = getItemInfo(itemName).placeOrder(qty);
@@ -65,13 +65,13 @@ public class OnlineStore {
     }
 
     private StoreItem getItemInfo(String itemName) {
-        return iventory.get(itemName.hashCode());
+        return inventory.get(itemName.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(StoreItem item: iventory.values()) {
+        for(StoreItem item: inventory.values()) {
             sb.append(String.format("%s\n", item.toString()));
         }
         return sb.toString();
