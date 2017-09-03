@@ -1,36 +1,64 @@
+package ut.ee382n.ds.core.client;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class StoreClient implements IStoreClient {
 
-    ClientProtocol protocol = new TCPClientProtocol();
+    ClientProtocol protocol;
+    InetAddress serverAddress;
+    int port;
+
+    public StoreClient(InetAddress address, int port) {
+        this.serverAddress = address;
+        this.port = port;
+        setMode("U");
+    }
+
 
     public void setMode(String mode) {
+        // TODO close current connection and change protocol.
         switch (mode) {
             case "U":
-                protocol = new UDPClientProtocol();
+                protocol = new UDPClientProtocol(serverAddress, port);
                 break;
             case "T":
-                protocol = new TCPClientProtocol();
+                protocol = new TCPClientProtocol(serverAddress, port);
                 break;
-            default:
-                throw new Exception("Unknown protocol:" + mode);
         }
     }
 
-    public String purchase(String username, String productName, int quantity){
-
+    public String sendMessageAndReceiveResponse(String message) {
+        return protocol.sendMessageAndReceiveResponse(message);
     }
 
-    public String cancel(int orderId) {
+    public static void main(String[] args) {
+        String hostname = "localhost";
+        int port = 2040;
 
-    }
+        Scanner stdin = new Scanner(System.in);
+        StoreClient client;
 
-    public String search(String userName) {
+        try {
+            InetAddress address = InetAddress.getByName(hostname);
+            client = new StoreClient(address, port);
 
-    }
+            while(true) {
+                String command = stdin.nextLine();
+                if (command.length() == 0) continue;
 
-    public String list() {
+                String[] tokens = command.split(" ");
+                if (tokens[0] == "setMode") {
+                    client.setMode(tokens[1]);
+                } else {
+                    System.out.println(client.sendMessageAndReceiveResponse(command));
+                }
+            }
 
+        } catch (UnknownHostException uhe) {
+            System.err.println(uhe);
+        }
     }
 
 }

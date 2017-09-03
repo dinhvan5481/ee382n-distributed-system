@@ -1,21 +1,42 @@
+package ut.ee382n.ds.core.client;
 
+import java.io.IOException;
+import java.net.*;
 
-public class UDPClientProtocol implements IStoreClient {
+public class UDPClientProtocol extends ClientProtocol {
 
-    public String purchase(String username, String productName, int quantity){
+    DatagramSocket datagramSocket;
+    byte[] buffer;
 
+    private final int BUFFER_SIZE = 1024;
+
+    public UDPClientProtocol(InetAddress address, int port) {
+        super(address, port);
+
+        try {
+            datagramSocket = new DatagramSocket();
+        } catch (SocketException se) {
+            System.err.println(se);
+        }
+
+        buffer = new byte[BUFFER_SIZE];
     }
 
-    public String cancel(int orderId) {
+    public String sendMessageAndReceiveResponse(String message) {
+        DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), this.serverAddress, this.port);
+        String receivedData = null;
+        try {
+            datagramSocket.send(packet);
 
-    }
+            DatagramPacket receivedPacket = new DatagramPacket(buffer, BUFFER_SIZE);
+            datagramSocket.receive(receivedPacket);
+            receivedData = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
 
-    public String search(String userName) {
+        } catch (IOException ioe){
+            System.err.println(ioe);
+        }
 
-    }
-
-    public String list() {
-
+        return receivedData;
     }
 
 }

@@ -6,18 +6,17 @@ import ut.ee382n.ds.core.OnlineStore;
 /**
  * Created by dinhvan5481 on 8/29/17.
  */
-public abstract class BaseStoreCommand<T> implements ICommand<T> {
+public abstract class BaseStoreCommand implements ICommand {
 
     protected OnlineStore store;
-    protected T result;
+    protected String result;
     protected BaseStoreCommand(OnlineStore store) {
         this.store = store;
     }
 
     public abstract void execute();
 
-    @Override
-    public T getResult() {
+    public String getResult() {
         return this.result;
     }
 }

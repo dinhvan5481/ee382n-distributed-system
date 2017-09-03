@@ -1,7 +1,11 @@
 package ut.ee382n.ds.core;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,7 +35,7 @@ public class OnlineStore {
         }
         int orderId = storeOrderId.getAndIncrement();
         orders.put(orderId, new StoreOrder(orderId, username, purchasedItem));
-        return String.format("`Your order has been placed, %d %s %s %d", orderId, username, itemName, qty);
+        return String.format("Your order has been placed, %d %s %s %d", orderId, username, itemName, qty);
     }
 
     public String cancelOrder(int orderId) {
@@ -41,15 +45,15 @@ public class OnlineStore {
         }
         order.cancel();
         getItemInfo(order.getItem().getName()).cancelOrder(order.getItem().getQty());
-        return String.format("Order % is cancelled", orderId);
+        return String.format("Order %d is cancelled", orderId);
     }
 
     public String search(String userName) {
         Collection<StoreOrder> ordereds = orders.values();
         Collection<StoreOrder> searchOrders = ordereds.parallelStream()
-                .filter((o) -> o.getUserName() == userName && o.getStatus() != StoreOrder.ORDER_STATUS.CANCELLED)
+                .filter((o) -> o.getUserName().equals(userName) && o.getStatus() != StoreOrder.ORDER_STATUS.CANCELLED)
                 .collect(Collectors.toList());
-        if(searchOrders.size() < 1) {
+        if(searchOrders.size() == 0) {
             return String.format("No order found for %s", userName);
         }
         StringBuilder sb = new StringBuilder();
@@ -60,8 +64,28 @@ public class OnlineStore {
     }
 
     public static OnlineStore createOnlineStoreFromFile(String fileName) {
-        // process files, and load items
-        return new OnlineStore();
+        try {
+            Scanner fileIn = new Scanner(new BufferedInputStream(new FileInputStream(fileName)));
+            OnlineStore store = new OnlineStore();
+            String line;
+            System.out.println("Loading inventory... ");
+
+            while (fileIn.hasNextLine()) {
+                line = fileIn.nextLine();
+                System.out.println(line);
+                String[] tokens = line.split(" ");
+                String itemName = tokens[0];
+                int quantity = Integer.parseInt(tokens[1]);
+
+                StoreItem newItem = new StoreItem(itemName, quantity);
+                store.inventory.put(newItem.hashCode(), newItem);
+            }
+
+            return store;
+        } catch (FileNotFoundException fne){
+            System.err.println(fne);
+            return null;
+        }
     }
 
     private StoreItem getItemInfo(String itemName) {

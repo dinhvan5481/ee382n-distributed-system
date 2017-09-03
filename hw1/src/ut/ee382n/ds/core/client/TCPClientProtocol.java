@@ -1,20 +1,16 @@
+package ut.ee382n.ds.core.client;
 
+import java.net.InetAddress;
 
-public class TCPClientProtocol implements IStoreClient {
+public class TCPClientProtocol extends ClientProtocol {
 
-    public String purchase(String username, String productName, int quantity){
-
-    }
-
-    public String cancel(int orderId) {
-
-    }
-
-    public String search(String userName) {
+    public TCPClientProtocol(InetAddress address, int port) {
+        super(address, port);
 
     }
 
-    public String list() {
-
+    public String sendMessageAndReceiveResponse(String message) {
+        return "";
     }
+
 }

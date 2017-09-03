@@ -1,12 +1,7 @@
-
+package ut.ee382n.ds.core.client;
 
 public interface IStoreClient {
 
-    String purchase(String username, String productName, int quantity);
+    String sendMessageAndReceiveResponse(String message);
 
-    String cancel(int orderId);
-
-    String search(String userName);
-
-    String list();
 }

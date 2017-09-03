@@ -1,24 +1,30 @@
 package ut.ee382n.ds.core;
 
-import java.net.*;
-import java.io.*;
+import java.io.File;
 import java.util.concurrent.*;
 
 public class StoreServer {
 
-    private final int UDP_PORT = 2040;
+    private static final int UDP_PORT = 2040;
 
     private ExecutorService threadPool;
 
     public static void main(String[] args) {
 
-        StoreServerUDPHandler udpHandler = new StoreServerUDPHandler();
+        String inventoryFile = "inventory.txt";
+
+        OnlineStore store = OnlineStore.createOnlineStoreFromFile(inventoryFile);
+
+        if (store == null) {
+            return;
+        }
+
+        StoreServerUDPHandler udpHandler = new StoreServerUDPHandler(UDP_PORT, store);
         // TODO: TCP Handler
 
         Thread udpHandlerThread = new Thread(udpHandler);
         try {
             udpHandlerThread.start();
-            this.join(udpHandlerThread);
         } finally {
 
         }
