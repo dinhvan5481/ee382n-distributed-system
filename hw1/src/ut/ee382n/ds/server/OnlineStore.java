@@ -1,4 +1,4 @@
-package ut.ee382n.ds.core;
+package ut.ee382n.ds.server;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -20,8 +19,8 @@ public class OnlineStore {
     private AtomicInteger storeOrderId;
 
     public OnlineStore() {
-        inventory = new HashMap<Integer, StoreItem>();
-        orders = new ConcurrentHashMap<Integer, StoreOrder>();
+        inventory = new HashMap<>();
+        orders = new ConcurrentHashMap<>();
         storeOrderId = new AtomicInteger(0);
     }
 

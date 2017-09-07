@@ -1,4 +1,4 @@
-package ut.ee382n.ds.core;
+package ut.ee382n.ds.server;
 
 public class StoreItem {
     private String name;
