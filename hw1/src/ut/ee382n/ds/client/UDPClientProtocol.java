@@ -10,15 +10,9 @@ public class UDPClientProtocol extends ClientProtocol {
 
     private final int BUFFER_SIZE = 1024;
 
-    public UDPClientProtocol(InetAddress address, int port) {
+    public UDPClientProtocol(InetAddress address, int port) throws SocketException {
         super(address, port);
-
-        try {
-            datagramSocket = new DatagramSocket();
-        } catch (SocketException se) {
-            System.err.println(se);
-        }
-
+        datagramSocket = new DatagramSocket();
         buffer = new byte[BUFFER_SIZE];
     }
 

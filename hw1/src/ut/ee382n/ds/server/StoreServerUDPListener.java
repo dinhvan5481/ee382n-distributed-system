@@ -5,13 +5,13 @@ import ut.ee382n.ds.core.Helper;
 import java.net.*;
 import java.io.*;
 
-public class StoreServerUDPHandler implements Runnable {
+public class StoreServerUDPListener implements Runnable {
 
     private final int BUFFER_SIZE = 1024;
     private final int PORT;
     private final OnlineStore store;
 
-    public StoreServerUDPHandler(int port, OnlineStore store) {
+    public StoreServerUDPListener(int port, OnlineStore store) {
         PORT = port;
         this.store = store;
     }

@@ -20,7 +20,7 @@ public class StoreServer {
             return;
         }
 
-        StoreServerUDPHandler udpHandler = new StoreServerUDPHandler(UDP_PORT, store);
+        StoreServerUDPListener udpHandler = new StoreServerUDPListener(UDP_PORT, store);
 
         StoreServerTCPListener tcpHandler;
         try {

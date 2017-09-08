@@ -39,8 +39,4 @@ public class Helper {
                 return String.format("Unknown command %s", command);
         }
     }
-
-    public static String[] emptyOperands() {
-        return new String[]{};
-    }
 }
