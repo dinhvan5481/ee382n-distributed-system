@@ -60,7 +60,7 @@ public class StoreClient implements IStoreClient, Runnable {
             } else if(tokens[0].equals("exit")) {
                 break;
             } else {
-                output.println(sendMessageAndReceiveResponse(command));
+                output.print(sendMessageAndReceiveResponse(command));
             }
         }
     }
