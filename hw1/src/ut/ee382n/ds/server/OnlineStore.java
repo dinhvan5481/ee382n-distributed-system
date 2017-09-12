@@ -21,30 +21,31 @@ public class OnlineStore {
     public OnlineStore() {
         inventory = new HashMap<>();
         orders = new ConcurrentHashMap<>();
-        storeOrderId = new AtomicInteger(0);
+        storeOrderId = new AtomicInteger(1);
     }
 
     public String placeOrder(String username, String itemName, int qty) {
         if(!this.inventory.containsKey(itemName.hashCode())) {
-            return "`Not Available - We do not sell this product";
+            return "Not Available - We do not sell this product\n";
         }
         StoreItem purchasedItem = getItemInfo(itemName).placeOrder(qty);
         if(purchasedItem == null) {
-            return "`Not Available - Not enough items";
+            return "Not Available - Not enough items\n";
+
         }
         int orderId = storeOrderId.getAndIncrement();
         orders.put(orderId, new StoreOrder(orderId, username, purchasedItem));
-        return String.format("Your order has been placed, %d %s %s %d", orderId, username, itemName, qty);
+        return String.format("Your order has been placed, %d %s %s %d\n", orderId, username, itemName, qty);
     }
 
     public String cancelOrder(int orderId) {
         StoreOrder order = orders.get(orderId);
         if(order == null || order.getStatus() == StoreOrder.ORDER_STATUS.CANCELLED) {
-            return String.format("%d not found, no such order'.", orderId);
+            return String.format("%d not found, no such order\n", orderId);
         }
         order.cancel();
         getItemInfo(order.getItem().getName()).cancelOrder(order.getItem().getQty());
-        return String.format("Order %d is cancelled", orderId);
+        return String.format("Order %d is cancelled\n", orderId);
     }
 
     public String search(String userName) {
@@ -53,7 +54,7 @@ public class OnlineStore {
                 .filter((o) -> o.getUserName().equals(userName) && o.getStatus() != StoreOrder.ORDER_STATUS.CANCELLED)
                 .collect(Collectors.toList());
         if(searchOrders.size() == 0) {
-            return String.format("No order found for %s", userName);
+            return String.format("No order found for %s\n", userName);
         }
         StringBuilder sb = new StringBuilder();
         for(StoreOrder order: searchOrders) {

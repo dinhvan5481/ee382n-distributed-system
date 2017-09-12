@@ -10,62 +10,53 @@ public class StoreClient implements IStoreClient {
 
     ClientProtocol udpClient;
     ClientProtocol tcpClient;
+    ClientProtocol protocolChosen;
     InetAddress serverAddress;
-    ProtocolEnum protocolType;
-    int port;
+    int udpPort;
+    int tcpPort;
 
-    public enum ProtocolEnum {
-        TCP,
-        UDP
-    }
-
-    public StoreClient(InetAddress address, int port) throws IOException {
+    public StoreClient(InetAddress address, int udpPort, int tcpPort) throws IOException {
         this.serverAddress = address;
-        this.port = port;
-        this.protocolType = ProtocolEnum.TCP;
-        udpClient = new UDPClientProtocol(address, port);
-        tcpClient = new TCPClientProtocol(address, port);
+        this.udpPort = udpPort;
+        this.tcpPort = tcpPort;
+        udpClient = new UDPClientProtocol(address, udpPort);
+        tcpClient = new TCPClientProtocol(address, tcpPort);
+        protocolChosen = tcpClient;
     }
 
 
     public void setMode(String type) {
-        if(type == "U") {
-            this.protocolType = ProtocolEnum.UDP;
-        } else {
-            this.protocolType = ProtocolEnum.TCP;
+        if(type.equals("U")) {
+            protocolChosen = udpClient;
+        } else if (type.equals("T")){
+            protocolChosen = tcpClient;
         }
     }
 
     public String sendMessageAndReceiveResponse(String message) {
-        switch (this.protocolType) {
-            case TCP:
-                return tcpClient.sendMessageAndReceiveResponse(message);
-            case UDP:
-                return udpClient.sendMessageAndReceiveResponse(message);
-            default:
-                return "";
-        }
+        return protocolChosen.sendMessageAndReceiveResponse(message);
     }
 
     public static void main(String[] args) {
         String hostname = "localhost";
-        int port = 2040;
+        final int UDP_PORT = 2040;
+        final int TCP_PORT = 2050;
 
         Scanner stdin = new Scanner(System.in);
         StoreClient client;
 
         try {
             InetAddress address = InetAddress.getByName(hostname);
-            client = new StoreClient(address, port);
+            client = new StoreClient(address, UDP_PORT, TCP_PORT);
 
             while(true) {
                 String command = stdin.nextLine();
                 if (command.length() == 0) continue;
 
                 String[] tokens = command.split(" ");
-                if (tokens[0] == "setmode") {
+                if (tokens[0].equals("setmode")) {
                     client.setMode(tokens[1]);
-                } else if(tokens[0] == "exit") {
+                } else if(tokens[0].equals("exit")) {
                     break;
                 } else {
                     System.out.println(client.sendMessageAndReceiveResponse(command));
