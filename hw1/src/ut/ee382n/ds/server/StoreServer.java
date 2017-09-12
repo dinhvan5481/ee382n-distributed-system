@@ -8,8 +8,6 @@ public class StoreServer {
     private static final int UDP_PORT = 2040;
     private static final int TCP_WELCOME_PORT = 2050;
 
-    private ExecutorService threadPool;
-
     public static void main(String[] args) {
 
         String inventoryFile = "inventory.txt";
@@ -20,17 +18,16 @@ public class StoreServer {
             return;
         }
 
-        StoreServerUDPListener udpHandler = new StoreServerUDPListener(UDP_PORT, store);
+        StoreUDPListener udpHandler = new StoreUDPListener(UDP_PORT, store);
 
         StoreServerTCPListener tcpHandler;
         try {
             tcpHandler = new StoreServerTCPListener(TCP_WELCOME_PORT, store);
         } catch (IOException e) {
-            System.out.println("Cannot intialize TCP Handler. Exit store");
+            System.out.println("Cannot initialize TCP Handler. Exit store");
             e.printStackTrace();
             return;
         }
-        // TODO: TCP Handler
 
         Thread udpHandlerThread = new Thread(udpHandler);
         Thread tcpHandlerThread = new Thread(tcpHandler);

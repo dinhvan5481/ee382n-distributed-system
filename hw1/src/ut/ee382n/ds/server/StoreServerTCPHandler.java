@@ -3,19 +3,15 @@ package ut.ee382n.ds.server;
 import ut.ee382n.ds.core.Helper;
 import ut.ee382n.ds.core.Logger;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class StoreServerTCPHandler extends Thread {
     private Socket clientSocket;
     private BufferedReader inputStream;
-    private DataOutputStream outputStream;
-
+    private PrintStream outputStream;
     private OnlineStore store;
-
     private Logger logger;
 
     public StoreServerTCPHandler(Socket clientSocket, OnlineStore store) throws IOException {
@@ -23,7 +19,7 @@ public class StoreServerTCPHandler extends Thread {
         this.store = store;
 
         this.inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        this.outputStream = new DataOutputStream(clientSocket.getOutputStream());
+        this.outputStream = new PrintStream(clientSocket.getOutputStream());
 
         this.logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
@@ -32,14 +28,12 @@ public class StoreServerTCPHandler extends Thread {
         String cmdFromClient;
         try {
             while ((cmdFromClient = inputStream.readLine()) != null) {
-                logger.log(Logger.LOG_LEVEL.INFO, String.format("Received from client: %", cmdFromClient));
+                logger.log(Logger.LOG_LEVEL.INFO, String.format("Received from client: %s", cmdFromClient));
                 String result = Helper.parseServerInput(store, cmdFromClient);
                 sendTCPMessage(result);
-                break;
             }
         } catch (IOException e) {
-            logger.log(Logger.LOG_LEVEL.INFO, "Error while processing client command");
-            e.printStackTrace();
+            logger.log(Logger.LOG_LEVEL.INFO, "Connection with client ended.");
         } finally {
             try {
                 clientSocket.close();
@@ -51,13 +45,8 @@ public class StoreServerTCPHandler extends Thread {
         }
     }
 
-    private boolean sendTCPMessage(String message) {
-        try {
-            outputStream.writeBytes(message);
-        } catch (IOException e) {
-            logger.log(Logger.LOG_LEVEL.INFO, "Error while sending TCP result");
-            return false;
-        }
-        return true;
+    private void sendTCPMessage(String message) {
+        outputStream.println(message);
+        outputStream.flush();
     }
 }
