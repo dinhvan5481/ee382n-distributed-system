@@ -24,14 +24,13 @@ public class  TCPClientProtocol extends ClientProtocol {
     }
 
     public String sendMessageAndReceiveResponse(String message) {
-        boolean sendToServerResult = sendMessage(message);
-        if(!sendToServerResult) {
-            return "Error while sending message to server";
-        }
+        sendMessage(message);
 
         StringBuilder sb = new StringBuilder();
         while (tcpInputStream.hasNextLine()) {
             String line = tcpInputStream.nextLine();
+            // All responses from server send an extra new line to
+            // let know the client the response has ended.
             if(line.length() == 0) {
                 break;
             }
@@ -41,16 +40,9 @@ public class  TCPClientProtocol extends ClientProtocol {
         return sb.toString();
     }
 
-    private boolean sendMessage(String message) {
-//        try {
-            tcpOutputStream.println(message);
-            tcpOutputStream.flush();
-//        } catch (IOException e) {
-//            System.out.println("Error while sending TCP message to " + serverAddress + " at port " + port);
-//            System.out.println();
-//            return false;
-//        }
-        return true;
+    private void sendMessage(String message) {
+        tcpOutputStream.println(message);
+        tcpOutputStream.flush();
     }
 
 }
