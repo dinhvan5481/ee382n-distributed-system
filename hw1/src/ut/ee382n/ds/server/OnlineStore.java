@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
@@ -95,9 +96,10 @@ public class OnlineStore {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(StoreItem item: inventory.values()) {
-            sb.append(String.format("%s\n", item.toString()));
-        }
+        inventory.values()
+                .stream()
+                .sorted(Comparator.comparing(StoreItem::getName))
+                .forEach(i -> sb.append(String.format("%s\n", i.toString())));
         return sb.toString();
     }
 
