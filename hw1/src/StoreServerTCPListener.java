@@ -1,7 +1,3 @@
-package ut.ee382n.ds.server;
-
-import ut.ee382n.ds.core.Logger;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

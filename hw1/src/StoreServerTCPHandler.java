@@ -1,11 +1,5 @@
-package ut.ee382n.ds.server;
-
-import ut.ee382n.ds.core.Helper;
-import ut.ee382n.ds.core.Logger;
-
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class StoreServerTCPHandler extends Thread {
     private Socket clientSocket;

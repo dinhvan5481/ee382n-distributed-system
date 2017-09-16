@@ -1,7 +1,3 @@
-package ut.ee382n.ds.tests;
-
-import ut.ee382n.ds.client.StoreClient;
-
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

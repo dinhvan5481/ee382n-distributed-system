@@ -1,5 +1,3 @@
-package ut.ee382n.ds.server;
-
 public class StoreOrder {
 
     private int orderId;

@@ -1,5 +1,3 @@
-package ut.ee382n.ds.client;
-
 import java.net.*;
 
 public abstract class ClientProtocol implements IStoreClient {

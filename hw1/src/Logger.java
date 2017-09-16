@@ -1,5 +1,3 @@
-package ut.ee382n.ds.core;
-
 /**
  * Created by quachv on 8/25/2016.
  */

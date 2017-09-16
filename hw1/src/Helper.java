@@ -1,7 +1,3 @@
-package ut.ee382n.ds.core;
-
-
-import ut.ee382n.ds.server.OnlineStore;
 
 /**
  * Created by dinhvan5481 on 8/29/17.
