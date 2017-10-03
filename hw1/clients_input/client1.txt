@@ -1,8 +1,6 @@
-list
-purchase guillermo phone 3
-search guillermo
-purchase guillermo camera 4
-purchase guillermo ps4 5
-purchase guillermo laptop 4
-search guillermo
-list
+2
+127.0.0.1:8025
+127.0.0.1:8030
+reserve Bob
+delete Mary
+search John

@@ -1,42 +1,79 @@
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class  TCPClientProtocol extends ClientProtocol {
+public class  TCPClientProtocol{
+
+
+    private int serverId;
+    private ArrayList<String> servers;
     private Socket tcpSocket;
     private PrintStream tcpOutputStream;
     private Scanner tcpInputStream;
+    private final int TIME_OUT = 100;
 
     private Logger logger;
 
-    public TCPClientProtocol(InetAddress address, int port) throws IOException {
-        super(address, port);
-        this.tcpSocket = new Socket(serverAddress, port);
-        this.tcpOutputStream = new PrintStream(this.tcpSocket.getOutputStream());
-        this.tcpInputStream = new Scanner(this.tcpSocket.getInputStream());
-
+    public TCPClientProtocol(ArrayList<String> servers) {
+        this.servers = servers;
+        serverId = 0;
         logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
 
-    public String sendMessageAndReceiveResponse(String message) {
-        sendMessage(message);
-
-        StringBuilder sb = new StringBuilder();
-        while (tcpInputStream.hasNextLine()) {
-            String line = tcpInputStream.nextLine();
-            // All responses from server send an extra new line to
-            // let know the client the response has ended.
-            if(line.length() == 0) {
-                break;
+    private void ensureActiveConnection() {
+        serverId = 0;
+        while (tcpSocket == null) {
+            String[] serverInfo = servers.get(serverId).split(":");
+            long currentTimeMillis = System.currentTimeMillis();
+            while (System.currentTimeMillis() - currentTimeMillis < TIME_OUT) {
+                try {
+                    InetAddress serverAddress = InetAddress.getByName(serverInfo[0]);
+                    int port = Integer.parseInt(serverInfo[1]);
+                    tcpSocket = new Socket(serverAddress, port);
+                    tcpOutputStream = new PrintStream(this.tcpSocket.getOutputStream());
+                    tcpInputStream = new Scanner(this.tcpSocket.getInputStream());
+                } catch (IOException ioe) {
+                    System.err.printf("Error connecting to: %s:%s\n", serverInfo);
+                    System.err.println(ioe);
+                    clearConnection();
+                }
             }
-            sb.append(line);
-            sb.append("\n");
+
+            serverId = ++serverId % servers.size();
         }
-        return sb.toString();
+    }
+    private void clearConnection() {
+        tcpSocket = null;
+        tcpOutputStream = null;
+        tcpInputStream = null;
+    }
+
+    public String sendMessageAndReceiveResponse(String message) {
+        String response = null;
+
+        while (response == null) {
+            ensureActiveConnection();
+            sendMessage(message);
+
+            try {
+                response = tcpInputStream.nextLine();
+            } catch (NoSuchElementException nse) {
+                System.err.println(nse);
+                clearConnection();
+            } catch (IllegalStateException ise) {
+                System.err.println(ise);
+                clearConnection();
+            }
+        }
+
+        return response;
     }
 
     private void sendMessage(String message) {
+
         tcpOutputStream.println(message);
         tcpOutputStream.flush();
     }
