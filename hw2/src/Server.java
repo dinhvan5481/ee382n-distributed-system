@@ -32,13 +32,7 @@ public class Server implements Runnable {
             servers.add(stdIn.nextLine());
         }
 
-        String inventoryFile = "inventory.txt";
-
-        OnlineStore store = OnlineStore.createOnlineStoreFromFile(inventoryFile);
-
-        if (store == null) {
-            return;
-        }
+        BookKeeper store = new BookKeeper(seats);
 
         int port = 8000;
         String[] serverInfo = servers.get(serverId).split(":");

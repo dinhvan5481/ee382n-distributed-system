@@ -5,10 +5,10 @@ public class StoreServerTCPHandler extends Thread {
     private Socket clientSocket;
     private BufferedReader inputStream;
     private PrintStream outputStream;
-    private OnlineStore store;
+    private BookKeeper store;
     private Logger logger;
 
-    public StoreServerTCPHandler(Socket clientSocket, OnlineStore store) throws IOException {
+    public StoreServerTCPHandler(Socket clientSocket, BookKeeper store) throws IOException {
         this.clientSocket = clientSocket;
         this.store = store;
 
@@ -23,7 +23,7 @@ public class StoreServerTCPHandler extends Thread {
         try {
             while ((cmdFromClient = inputStream.readLine()) != null) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Received from client: %s", cmdFromClient));
-                String result = Helper.parseServerInput(store, cmdFromClient);
+                String result = Parser.parseServerInput(store, cmdFromClient);
                 sendTCPMessage(result);
             }
         } catch (IOException e) {

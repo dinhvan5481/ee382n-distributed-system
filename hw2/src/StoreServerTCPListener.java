@@ -5,11 +5,11 @@ import java.net.Socket;
 public class StoreServerTCPListener implements Runnable {
     private int welcomePort;
     private ServerSocket serverSocket;
-    private OnlineStore store;
+    private BookKeeper store;
 
     private Logger logger;
 
-    public StoreServerTCPListener(int port, OnlineStore store) throws IOException {
+    public StoreServerTCPListener(int port, BookKeeper store) throws IOException {
         this.welcomePort = port;
         serverSocket = new ServerSocket(welcomePort);
         this.store = store;
