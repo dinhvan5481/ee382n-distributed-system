@@ -3,4 +3,8 @@ public class ReleaseServerCommand extends ServerCommand {
         super(serverId, clockValue);
         cmd = "release";
     }
+
+    public void setReleaseClockValue(long releaseClockValue) {
+        additionalInfos.add("" + releaseClockValue);
+    }
 }
