@@ -38,9 +38,9 @@ public class Server implements Runnable {
         String[] serverInfo = servers.get(serverId).split(":");
         port = Integer.parseInt(serverInfo[1]);
 
-        StoreServerTCPListener tcpHandler;
+        ServerTCPListener tcpHandler;
         try {
-            tcpHandler = new StoreServerTCPListener(port, store);
+            tcpHandler = new ServerTCPListener(port, store);
         } catch (IOException e) {
             System.out.println("Cannot initialize TCP Handler. Exit store");
             e.printStackTrace();

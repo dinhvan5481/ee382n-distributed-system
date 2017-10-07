@@ -1,14 +1,14 @@
 import java.io.*;
 import java.net.Socket;
 
-public class StoreServerTCPHandler extends Thread {
+public class ServerTCPHandler extends Thread {
     private Socket clientSocket;
     private BufferedReader inputStream;
     private PrintStream outputStream;
     private BookKeeper store;
     private Logger logger;
 
-    public StoreServerTCPHandler(Socket clientSocket, BookKeeper store) throws IOException {
+    public ServerTCPHandler(Socket clientSocket, BookKeeper store) throws IOException {
         this.clientSocket = clientSocket;
         this.store = store;
 

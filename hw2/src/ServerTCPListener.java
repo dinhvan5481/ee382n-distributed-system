@@ -2,14 +2,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class StoreServerTCPListener implements Runnable {
+public class ServerTCPListener implements Runnable {
     private int welcomePort;
     private ServerSocket serverSocket;
     private BookKeeper store;
 
     private Logger logger;
 
-    public StoreServerTCPListener(int port, BookKeeper store) throws IOException {
+    public ServerTCPListener(int port, BookKeeper store) throws IOException {
         this.welcomePort = port;
         serverSocket = new ServerSocket(welcomePort);
         this.store = store;
@@ -32,9 +32,9 @@ public class StoreServerTCPListener implements Runnable {
                 continue;
             }
 
-            StoreServerTCPHandler serverTCPHandler = null;
+            ServerTCPHandler serverTCPHandler = null;
             try {
-                serverTCPHandler = new StoreServerTCPHandler(incomingClientSocket, store);
+                serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store);
             } catch (IOException e) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Error while creating TCP handler"));
                 e.printStackTrace();
