@@ -1,0 +1,8 @@
+setmode U
+search mary
+purchase mary phone 2
+purchase mary ps4 6
+purchase mary xbox 3
+list
+cancel 4
+search mary
