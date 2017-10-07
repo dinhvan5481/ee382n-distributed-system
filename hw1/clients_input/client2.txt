@@ -1,6 +1,0 @@
-purchase van xbox 10
-purchase van phone 2
-purchase van ps4 5
-purchase van xbox 3
-search van
-list
