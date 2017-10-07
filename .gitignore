@@ -1,0 +1,9 @@
+# IDEA
+.idea
+
+# Compiled
+*.class
+'
+# Output
+*output*
+*.out
