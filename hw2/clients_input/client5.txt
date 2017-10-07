@@ -1,7 +1,0 @@
-setmode U
-purchase anita phone 4
-search anita
-purchase anita ps4 4
-purchase anita xbox 3
-purchase anita camera 2
-list

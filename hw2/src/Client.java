@@ -21,7 +21,7 @@ public class Client implements IStoreClient, Runnable {
         this(System.in, System.out);
     }
 
-    public Client(InputStream input, PrintStream output) throws IOException {
+    public Client(InputStream input, PrintStream output) {
         this.input = input;
         this.output = output;
     }
