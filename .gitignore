@@ -1,9 +1,10 @@
 # IDEA
-.idea
+*.idea
+*.iml
 
 # Compiled
 *.class
-'
+
 # Output
 *output*
 *.out
