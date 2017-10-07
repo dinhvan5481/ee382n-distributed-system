@@ -25,7 +25,7 @@ public class ServerSynchronizer {
     }
 
     public void getRequest(int serverRequestId, int senderClockValue) {
-        logicalClock.syncClock(senderClockValue);
+        logicalClock.tick(senderClockValue);
         ServerRequest request = new ServerRequest(serverRequestId, senderClockValue);
         requests.add(request);
 
@@ -39,7 +39,15 @@ public class ServerSynchronizer {
         sendCommand(dest, ackServerCommand);
     }
 
-    public void receiveAck(int s) {
+    public void receiveAck(int serverId, long clockValue) {
+
+    }
+
+    public void sendRelease() {
+
+    }
+
+    public void receiveRelease() {
 
     }
 

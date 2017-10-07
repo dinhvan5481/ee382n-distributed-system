@@ -9,7 +9,7 @@ public class LogicalClock {
         return clockValue;
     }
 
-    public synchronized long syncClock(long receivedClockValue) {
+    public synchronized long tick(long receivedClockValue) {
         if(clockValue < receivedClockValue) {
             this.clockValue = receivedClockValue + 1;
         } else {
