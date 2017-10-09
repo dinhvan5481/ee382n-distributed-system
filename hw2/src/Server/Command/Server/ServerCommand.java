@@ -1,16 +1,19 @@
 package Server.Command.Server;
 
+import Server.Command.Command;
+
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class ServerCommand {
+public abstract class ServerCommand extends Command {
     protected String cmd;
     protected int serverId;
     protected long clockValue;
     protected List<String> additionalInfos;
 
-    protected ServerCommand(){}
-    protected ServerCommand(int serverId, long clockValue) {
+    protected ServerCommand(Socket clientSocket, int serverId, long clockValue) {
+        super(clientSocket);
         this.cmd = "base";
         this.serverId = serverId;
         this.clockValue = clockValue;
@@ -28,4 +31,10 @@ public abstract class ServerCommand {
         }
         return sb.toString();
     }
-}
+
+    @Override
+    public String executeClientCmd(String[] tokens) {
+        return "";
+    }
+
+    public abstract void executeServerCmd(String[] tokens);}
