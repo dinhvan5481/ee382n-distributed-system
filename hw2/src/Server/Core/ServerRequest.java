@@ -1,3 +1,5 @@
+package Server.Core;
+
 public class ServerRequest {
     private int requestedServerId;
     private long clockValue;

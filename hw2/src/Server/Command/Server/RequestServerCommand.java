@@ -1,3 +1,5 @@
+package Server.Command.Server;
+
 public class RequestServerCommand extends ServerCommand {
 
     public RequestServerCommand(int serverId, long clockValue) {

@@ -1,4 +1,9 @@
-import java.util.Dictionary;
+package Server.Core;
+
+import Server.Core.ServerInfo;
+import Server.Server;
+import Server.Synchronize.LogicalClock;
+
 import java.util.HashMap;
 
 public class SystemInfo {

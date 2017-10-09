@@ -1,3 +1,10 @@
+package Server.Utils;
+
+import Server.BookKeeper;
+import Server.Server.*;
+import Server.Synchronize.ServerSynchronizer;
+import Server.Utils.ServerTCPHandler;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,13 +13,15 @@ public class ServerTCPListener implements Runnable {
     private int welcomePort;
     private ServerSocket serverSocket;
     private BookKeeper store;
+    private ServerSynchronizer synchronizer;
 
     private Logger logger;
 
-    public ServerTCPListener(int port, BookKeeper store) throws IOException {
+    public ServerTCPListener(int port, Server.BookKeeper store, ServerSynchronizer synchronizer) throws IOException {
         this.welcomePort = port;
         serverSocket = new ServerSocket(welcomePort);
         this.store = store;
+        this.synchronizer = synchronizer;
         logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
 
@@ -34,7 +43,7 @@ public class ServerTCPListener implements Runnable {
 
             ServerTCPHandler serverTCPHandler = null;
             try {
-                serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store);
+                serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store, this.synchronizer);
             } catch (IOException e) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Error while creating TCP handler"));
                 e.printStackTrace();

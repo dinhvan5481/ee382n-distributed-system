@@ -1,3 +1,5 @@
+import Server.Utils.Logger;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -45,6 +47,7 @@ public class  TCPClientProtocol{
             serverId = ++serverId % servers.size();
         }
     }
+
     private void clearConnection() {
         tcpSocket = null;
         tcpOutputStream = null;

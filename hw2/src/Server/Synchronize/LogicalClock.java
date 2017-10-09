@@ -1,3 +1,7 @@
+package Server.Synchronize;
+
+import Server.Server;
+
 public class LogicalClock {
     private long clockValue;
 
