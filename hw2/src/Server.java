@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,21 +24,40 @@ public class Server implements Runnable {
     @Override
     public void run() {
         Scanner stdIn = new Scanner(input);
+        LogicalClock logicalClock = new LogicalClock();
 
         int serverId = Integer.parseInt(stdIn.next());
         int nServers = Integer.parseInt(stdIn.next());
         int seats = Integer.parseInt(stdIn.next());
-        ArrayList<String> servers = new ArrayList<>(nServers);
 
+
+        ArrayList<String> servers = new ArrayList<>(nServers);
         for(int i = 0; i < nServers; i++){
             servers.add(stdIn.nextLine());
         }
 
         BookKeeper store = new BookKeeper(seats);
+        SystemInfo systemInfo = new SystemInfo(logicalClock);
 
-        int port = 8000;
-        String[] serverInfo = servers.get(serverId).split(":");
-        port = Integer.parseInt(serverInfo[1]);
+        int port = 0;
+        for (int i = 0; i < nServers; i++) {
+            String[] strServerInfo = servers.get(i).split(":");
+
+            if(i != serverId - 1) {
+                InetAddress serverIp = null;
+                try {
+                    serverIp = InetAddress.getByName(strServerInfo[0]);
+                } catch (UnknownHostException e) {
+                    System.out.println("Server input file is not correct.");
+                    e.printStackTrace();
+                    return;
+                }
+                ServerInfo serverInfo = new ServerInfo(i + 1, serverIp, Integer.parseInt(strServerInfo[1]));
+                systemInfo.addServers(i + 1, serverInfo);
+            } else {
+                port = Integer.parseInt(strServerInfo[1]);
+            }
+        }
 
         ServerTCPListener tcpHandler;
         try {

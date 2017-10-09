@@ -19,8 +19,8 @@ public class ServerInfo {
         return id;
     }
 
-    public boolean isMe(int id) {
-        return this.id == id;
+    public boolean isMe(int requestServerId) {
+        return this.id == requestServerId;
     }
 
     public boolean isOnline() {
@@ -29,6 +29,17 @@ public class ServerInfo {
 
     public void setOnlineStatus(boolean status) {
         this.isOnline = status;
+    }
+
+    public boolean sendMessage(int requestServerId, String message) {
+        if(isMe(requestServerId)) {
+            return true;
+        }
+        return sendTCPMessageToServer(message);
+    }
+
+    private boolean sendTCPMessageToServer(String message) {
+        return true;
     }
 
 }
