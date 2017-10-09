@@ -4,7 +4,7 @@ import java.net.Socket;
 
 public class RequestServerCommand extends ServerCommand {
 
-    protected RequestServerCommand(Socket clientSocket, int serverId, long clockValue) {
+    public RequestServerCommand(Socket clientSocket, int serverId, long clockValue) {
         super(clientSocket, serverId, clockValue);
         cmd = "request";
     }

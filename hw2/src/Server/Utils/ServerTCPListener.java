@@ -15,9 +15,10 @@ public class ServerTCPListener implements Runnable {
     private BookKeeper store;
     private ServerSynchronizer synchronizer;
 
+
     private Logger logger;
 
-    public ServerTCPListener(int port, Server.BookKeeper store, ServerSynchronizer synchronizer) throws IOException {
+    public ServerTCPListener(int port, BookKeeper store, ServerSynchronizer synchronizer) throws IOException {
         this.welcomePort = port;
         serverSocket = new ServerSocket(welcomePort);
         this.store = store;
@@ -43,7 +44,7 @@ public class ServerTCPListener implements Runnable {
 
             ServerTCPHandler serverTCPHandler = null;
             try {
-                serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store, this.synchronizer);
+                serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store, synchronizer);
             } catch (IOException e) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Error while creating TCP handler"));
                 e.printStackTrace();

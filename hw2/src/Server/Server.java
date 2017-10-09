@@ -46,7 +46,8 @@ public class Server implements Runnable {
         }
 
         BookKeeper store = new BookKeeper(seats);
-        SystemInfo systemInfo = new SystemInfo(logicalClock);
+        SystemInfo systemInfo = new SystemInfo(serverId, logicalClock);
+        ServerSynchronizer synchronizer = new ServerSynchronizer(serverId, logicalClock);
 
         int port = 0;
         for (int i = 0; i < nServers; i++) {
@@ -70,7 +71,7 @@ public class Server implements Runnable {
 
         ServerTCPListener tcpHandler;
         try {
-            tcpHandler = new ServerTCPListener(port, store);
+            tcpHandler = new ServerTCPListener(port, store, synchronizer);
         } catch (IOException e) {
             System.out.println("Cannot initialize TCP Handler. Exit store");
             e.printStackTrace();

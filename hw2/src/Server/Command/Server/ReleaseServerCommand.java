@@ -5,7 +5,7 @@ import java.net.Socket;
 public class ReleaseServerCommand extends ServerCommand {
 
 
-    protected ReleaseServerCommand(Socket clientSocket, int serverId, long clockValue) {
+    public ReleaseServerCommand(Socket clientSocket, int serverId, long clockValue) {
         super(clientSocket, serverId, clockValue);
         cmd = "release";
     }

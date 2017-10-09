@@ -20,11 +20,18 @@ public class ServerSynchronizer {
     private AtomicInteger numAcks;
     private ServerRequest currentRequest;
 
-    public ServerSynchronizer(LogicalClock logicalClock) {
+    public ServerSynchronizer(int id, LogicalClock logicalClock) {
+        this.id = id;
         servers = new ConcurrentHashMap<>();
         this.logicalClock = logicalClock;
         requests = new ConcurrentHashMap<>();
         numAcks = new AtomicInteger(0);
+    }
+
+    public void addServer(int id, ServerInfo serverInfo) {
+        if(!servers.contains(id)) {
+            servers.put(id, serverInfo);
+        }
     }
 
     public void sendRequest() {
