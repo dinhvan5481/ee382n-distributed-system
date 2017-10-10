@@ -53,7 +53,7 @@ public class ServerInfo {
         return serverState;
     }
 
-    public void setOnlineStatus(ServerState status) {
+    public void setServerState(ServerState status) {
         this.serverState = status;
     }
 

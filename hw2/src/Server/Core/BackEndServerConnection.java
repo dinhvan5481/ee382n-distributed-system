@@ -1,6 +1,7 @@
 package Server.Core;
 
 import Server.Command.Server.JoinServerCommand;
+import Server.Command.Server.ServerCommand;
 import Server.Synchronize.ServerSynchronizer;
 
 import java.io.IOException;
@@ -13,8 +14,11 @@ public class BackEndServerConnection implements Runnable {
     private ServerSynchronizer serverSynchronizer;
     private ServerInfo requestingServer;
     public BackEndServerConnection(int myId, ServerSynchronizer serverSynchronizer, int requestingServerId) {
+        if(myId == requestingServerId) {
+            throw new IllegalArgumentException("Cannot connect to ourself.");
+        }
         this.serverSynchronizer = serverSynchronizer;
-        this.id = id;
+        this.id = myId;
         this.requestingServer = serverSynchronizer.getServerInfo(requestingServerId);
     }
 
@@ -29,7 +33,8 @@ public class BackEndServerConnection implements Runnable {
             e.printStackTrace();
             return;
         }
-        JoinServerCommand sendingJoinCmd = new JoinServerCommand(new String[] {"join", "" + requestingServer.getId(), "" + 0},socket, serverSynchronizer);
+        JoinServerCommand sendingJoinCmd = new JoinServerCommand(new String[] {"join", "" + requestingServer.getId(), "" + 0},socket, serverSynchronizer, ServerCommand.Direction.Sending);
+        sendingJoinCmd.execute();
         try {
             sendingJoinCmd.setOutputStream(new PrintStream(socket.getOutputStream()));
         } catch (IOException e) {

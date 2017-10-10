@@ -16,23 +16,11 @@ public class SystemInfo {
 
 
     private int myId;
-    private HashMap<Integer, ServerInfo> servers;
     private LogicalClock logicalClock;
 
-    private BufferedReader inputStream;
-    private PrintStream outputStream;
-    private Socket clientSocket;
-
     public SystemInfo(int id, LogicalClock clock) {
-        servers = new HashMap<>();
         logicalClock = clock;
         myId = id;
-    }
-
-    public void addServers(int id, ServerInfo serverInfo) {
-        if(!servers.containsKey(id)) {
-            servers.put(id, serverInfo);
-        }
     }
 
     public LogicalClock getLogicalClock() {

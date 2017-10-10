@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class ServerCommand extends Command {
 
-    public static enum Direction {
+    public enum Direction {
         Receiving,
         Sending
     }
@@ -45,15 +45,15 @@ public abstract class ServerCommand extends Command {
         }
     }
 
-    public abstract void executeSending();
-    public abstract void executeReceiving();
+    protected abstract void executeSending();
+    protected abstract void executeReceiving();
 
     public String buildSendingCmd(long clockValue, String[] additionInfo) {
         StringBuilder sb = new StringBuilder(cmd + " " + clockValue + " " + serverId);
         if(additionalInfos != null) {
             for (String additionalInfo :
                     additionalInfos) {
-                sb.append(" " + additionalInfo);
+                sb.append(" ").append(additionalInfo);
             }
         }
         return sb.toString();

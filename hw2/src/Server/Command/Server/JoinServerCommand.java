@@ -1,13 +1,9 @@
 package Server.Command.Server;
 
-import Server.Command.Command;
-import Server.Command.NullCommand;
 import Server.Core.ServerInfo;
 import Server.Synchronize.ServerSynchronizer;
-import Server.Utils.Logger;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.Socket;
 
 public class JoinServerCommand extends ServerCommand {
@@ -19,7 +15,7 @@ public class JoinServerCommand extends ServerCommand {
     }
 
     @Override
-    public void executeSending() {
+    protected void executeSending() {
         long clockValue = synchronizer.getLogicalClock().tick();
         String cmd = buildSendingCmd(clockValue, null);
         sendTCPMessage(cmd);
@@ -32,7 +28,7 @@ public class JoinServerCommand extends ServerCommand {
                 result.execute();
             }
         } catch (IOException e) {
-            synchronizer.getServerInfo(endpointServerId).setOnlineStatus(ServerInfo.ServerState.OFFLINE);
+            synchronizer.getServerInfo(endpointServerId).setServerState(ServerInfo.ServerState.OFFLINE);
         } finally {
             try {
                 clientSocket.close();
@@ -44,8 +40,8 @@ public class JoinServerCommand extends ServerCommand {
     }
 
     @Override
-    public void executeReceiving() {
-        receivedServerInfo.setOnlineStatus(ServerInfo.ServerState.JOIN);
+    protected void executeReceiving() {
+        receivedServerInfo.setServerState(ServerInfo.ServerState.JOIN);
     }
 
     private ServerCommand parseServerInput(String input) {

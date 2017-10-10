@@ -4,6 +4,7 @@ import Server.BookKeeper;
 import Server.Command.Client.*;
 import Server.Command.Command;
 import Server.Command.NullCommand;
+import Server.Command.Server.*;
 import Server.Synchronize.ServerSynchronizer;
 
 import java.io.BufferedReader;
@@ -48,7 +49,6 @@ public class ServerTCPHandler extends Thread {
             } catch (IOException e) {
                 logger.log(Logger.LOG_LEVEL.INFO, "Error while closing client socket");
                 e.printStackTrace();
-                return;
             }
         }
     }
@@ -58,7 +58,7 @@ public class ServerTCPHandler extends Thread {
         outputStream.flush();
     }
 
-     public Command parseServerInput(BookKeeper store, String input) {
+     private Command parseServerInput(BookKeeper store, String input) {
         String[] tokens = input.split(" ");
         String command = tokens[0].toLowerCase();
         String name;
@@ -78,7 +78,14 @@ public class ServerTCPHandler extends Thread {
                 return new SearchClientCommand(tokens, clientSocket, store, synchronizer);
 
             case "join":
-                return new ReceivedJoinServerCommand(tokens, clientSocket, synchronizer);
+                return new JoinServerCommand(tokens, clientSocket, synchronizer, ServerCommand.Direction.Receiving);
+            case "request":
+                return new RequestServerCommand(tokens, clientSocket, synchronizer, ServerCommand.Direction.Receiving);
+            case "ack":
+                return new AckServerCommand(tokens, clientSocket, synchronizer, ServerCommand.Direction.Receiving);
+            case "release":
+                return new ReleaseServerCommand(tokens, clientSocket, synchronizer, ServerCommand.Direction.Receiving);
+
 
             default:
                 return new NullCommand();

@@ -1,5 +1,6 @@
 package Server;
 
+import Server.Core.BackEndServerConnection;
 import Server.Core.ServerInfo;
 import Server.Core.SystemInfo;
 import Server.Synchronize.LogicalClock;
@@ -13,6 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Server implements Runnable {
@@ -33,7 +35,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         Scanner stdIn = new Scanner(input);
-        LogicalClock logicalClock = new LogicalClock();
+
 
         int serverId = Integer.parseInt(stdIn.next());
         int nServers = Integer.parseInt(stdIn.next());
@@ -45,27 +47,32 @@ public class Server implements Runnable {
             servers.add(stdIn.nextLine());
         }
 
+        LogicalClock logicalClock = new LogicalClock();
         BookKeeper store = new BookKeeper(seats);
         SystemInfo systemInfo = new SystemInfo(serverId, logicalClock);
         ServerSynchronizer synchronizer = new ServerSynchronizer(serverId, logicalClock);
 
-        int port = 0;
-        for (int i = 0; i < nServers; i++) {
-            String[] strServerInfo = servers.get(i).split(":");
+        List<Integer> neighboorServers = new LinkedList<>();
 
-            if(i != serverId - 1) {
-                InetAddress serverIp = null;
-                try {
-                    serverIp = InetAddress.getByName(strServerInfo[0]);
-                } catch (UnknownHostException e) {
-                    System.out.println("Server input file is not correct.");
-                    e.printStackTrace();
-                    return;
-                }
-                ServerInfo serverInfo = new ServerInfo(i + 1, serverIp, Integer.parseInt(strServerInfo[1]));
-                systemInfo.addServers(i + 1, serverInfo);
-            } else {
+        int port = 0;
+        for (int i = 1; i <= nServers; i++) {
+            String[] strServerInfo = servers.get(i).split(":");
+            InetAddress serverIp = null;
+            try {
+                serverIp = InetAddress.getByName(strServerInfo[0]);
+            } catch (UnknownHostException e) {
+                System.out.println("Server input file is not correct.");
+                e.printStackTrace();
+                return;
+            }
+            ServerInfo serverInfo = new ServerInfo(i, serverIp, Integer.parseInt(strServerInfo[1]));
+            synchronizer.addServer(i, serverInfo);
+
+            if(i == serverId) {
                 port = Integer.parseInt(strServerInfo[1]);
+                serverInfo.setServerState(ServerInfo.ServerState.JOIN);
+            } else {
+                neighboorServers.add(i);
             }
         }
 
@@ -80,9 +87,17 @@ public class Server implements Runnable {
 
         LinkedList<Thread> tasks = new LinkedList<>();
 
+        for (Integer neiboorServerId :
+                neighboorServers) {
+            tasks.add(new Thread(new BackEndServerConnection(serverId, synchronizer, neiboorServerId)));
+        }
+
         Thread tcpListenerThread = new Thread(tcpListener);
+        tasks.add(tcpListenerThread);
         try {
-            tcpListenerThread.start();
+            for (Thread thread : tasks) {
+                thread.start();
+            }
         } catch (Exception e) {
             System.out.println("Cannot run store TCP handler thread. Exit store");
             e.printStackTrace();
@@ -90,14 +105,12 @@ public class Server implements Runnable {
         }
 
         try {
-            tcpListenerThread.join();
+            for (Thread thread : tasks) {
+                thread.join();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-    }
-
-    private  void connectToServers() {
 
     }
 

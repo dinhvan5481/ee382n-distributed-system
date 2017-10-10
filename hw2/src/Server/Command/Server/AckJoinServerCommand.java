@@ -4,11 +4,10 @@ import Server.Synchronize.ServerSynchronizer;
 
 import java.net.Socket;
 
-public class AckServerCommand extends ServerCommand {
-
-    public AckServerCommand(String[] tokens, Socket clientSocket, ServerSynchronizer synchronizer, Direction cmdDirection) {
+public class AckJoinServerCommand extends ServerCommand {
+    protected AckJoinServerCommand(String[] tokens, Socket clientSocket, ServerSynchronizer synchronizer, Direction cmdDirection) {
         super(tokens, clientSocket, synchronizer, cmdDirection);
-        cmd = "ack";
+        cmd = "ackjoin";
     }
 
     @Override
@@ -20,8 +19,8 @@ public class AckServerCommand extends ServerCommand {
 
     @Override
     public void executeReceiving() {
+        //Start sync process here
         synchronizer.getLogicalClock().tick(receivedClockValue);
-        //
 
     }
 }

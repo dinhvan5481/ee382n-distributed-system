@@ -1,11 +1,7 @@
 package Server.Synchronize;
 
-import Server.Command.Server.AckServerCommand;
-import Server.Command.Server.ReleaseServerCommand;
-import Server.Command.Server.RequestServerCommand;
 import Server.Command.Server.ServerCommand;
 import Server.Core.*;
-import Server.Server;
 
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +40,22 @@ public class ServerSynchronizer {
 
     public LogicalClock getLogicalClock() {
         return logicalClock;
+    }
+
+    public void addRequestToList(ServerRequest serverRequest) {
+        requests.put(serverRequest.getClockValue(), serverRequest);
+    }
+
+    public void setCurrentRequest(ServerRequest request) {
+        this.currentRequest = request;
+    }
+
+    public ServerRequest getCurrentRequest() {
+        return currentRequest;
+    }
+
+    public void setMyState(ServerInfo.ServerState state) {
+        servers.get(id).setServerState(state);
     }
 
     /*
