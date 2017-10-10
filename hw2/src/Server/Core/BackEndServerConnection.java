@@ -4,7 +4,9 @@ import Server.Command.Server.JoinServerCommand;
 import Server.Command.Server.ServerCommand;
 import Server.Synchronize.ServerSynchronizer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
@@ -34,9 +36,10 @@ public class BackEndServerConnection implements Runnable {
             return;
         }
         JoinServerCommand sendingJoinCmd = new JoinServerCommand(new String[] {"join", "" + requestingServer.getId(), "" + 0},socket, serverSynchronizer, ServerCommand.Direction.Sending);
-        sendingJoinCmd.execute();
         try {
             sendingJoinCmd.setOutputStream(new PrintStream(socket.getOutputStream()));
+            sendingJoinCmd.setInputStream(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            sendingJoinCmd.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }

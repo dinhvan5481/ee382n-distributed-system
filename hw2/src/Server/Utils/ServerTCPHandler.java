@@ -36,7 +36,7 @@ public class ServerTCPHandler extends Thread {
         String cmdFromClient;
         try {
             while ((cmdFromClient = inputStream.readLine()) != null) {
-                logger.log(Logger.LOG_LEVEL.INFO, String.format("Received from client: %s", cmdFromClient));
+                logger.log(Logger.LOG_LEVEL.INFO, String.format("Server %d -  Received from client: %s", synchronizer.getId(), cmdFromClient));
                 Command result = parseServerInput(store, cmdFromClient);
                 result.setOutputStream(outputStream);
                 result.execute();

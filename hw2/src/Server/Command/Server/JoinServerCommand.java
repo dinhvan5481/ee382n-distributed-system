@@ -2,6 +2,7 @@ package Server.Command.Server;
 
 import Server.Core.ServerInfo;
 import Server.Synchronize.ServerSynchronizer;
+import Server.Utils.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -23,6 +24,7 @@ public class JoinServerCommand extends ServerCommand {
         String response;
         try {
             while ((response = inputStream.readLine()) != null) {
+                logger.log(Logger.LOG_LEVEL.INFO, String.format("Server %d -  Response from server: %s", synchronizer.getId(), response));
                 ServerCommand result = parseServerInput(response);
                 result.setOutputStream(outputStream);
                 result.execute();

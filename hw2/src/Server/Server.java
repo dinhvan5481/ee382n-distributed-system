@@ -40,6 +40,7 @@ public class Server implements Runnable {
         int serverId = Integer.parseInt(stdIn.next());
         int nServers = Integer.parseInt(stdIn.next());
         int seats = Integer.parseInt(stdIn.next());
+        stdIn.nextLine();
 
 
         ArrayList<String> servers = new ArrayList<>(nServers);
@@ -55,7 +56,7 @@ public class Server implements Runnable {
         List<Integer> neighboorServers = new LinkedList<>();
 
         int port = 0;
-        for (int i = 1; i <= nServers; i++) {
+        for (int i = 0; i < nServers; i++) {
             String[] strServerInfo = servers.get(i).split(":");
             InetAddress serverIp = null;
             try {
@@ -65,14 +66,14 @@ public class Server implements Runnable {
                 e.printStackTrace();
                 return;
             }
-            ServerInfo serverInfo = new ServerInfo(i, serverIp, Integer.parseInt(strServerInfo[1]));
-            synchronizer.addServer(i, serverInfo);
+            ServerInfo serverInfo = new ServerInfo(i + 1, serverIp, Integer.parseInt(strServerInfo[1]));
+            synchronizer.addServer(i + 1, serverInfo);
 
-            if(i == serverId) {
+            if(i + 1 == serverId) {
                 port = Integer.parseInt(strServerInfo[1]);
                 serverInfo.setServerState(ServerInfo.ServerState.JOIN);
             } else {
-                neighboorServers.add(i);
+                neighboorServers.add(i + 1);
             }
         }
 

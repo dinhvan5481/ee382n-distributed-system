@@ -1,5 +1,7 @@
 package Server.Command;
 
+import Server.Utils.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,10 +20,12 @@ public abstract class Command {
     protected PrintStream outputStream;
     protected String[] tokens;
 
+    protected Logger logger;
+
     protected Command(String[] tokens, Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.tokens = tokens;
-
+        logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
 
     public CommandType getCommandType() {
@@ -37,6 +41,10 @@ public abstract class Command {
 
     public void setOutputStream(PrintStream outputStream) {
         this.outputStream = outputStream;
+    }
+
+    public void setInputStream(BufferedReader inputStream) {
+        this.inputStream = inputStream;
     }
 
     protected void sendTCPMessage(String message) {

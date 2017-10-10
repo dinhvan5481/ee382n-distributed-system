@@ -43,7 +43,6 @@ public class  TCPClientProtocol{
                     clearConnection();
                 }
             }
-
             serverId = ++serverId % servers.size();
         }
     }
