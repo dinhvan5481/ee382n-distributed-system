@@ -1,11 +1,10 @@
 package Server;
 
-import Server.Core.*;
+import Server.Core.ServerInfo;
 import Server.Core.SystemInfo;
 import Server.Synchronize.LogicalClock;
-import Server.Synchronize.*;
+import Server.Synchronize.ServerSynchronizer;
 import Server.Utils.ServerTCPListener;
-
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +12,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Server implements Runnable {
@@ -69,19 +69,20 @@ public class Server implements Runnable {
             }
         }
 
-        ServerTCPListener tcpHandler;
+        ServerTCPListener tcpListener;
         try {
-            tcpHandler = new ServerTCPListener(port, store, synchronizer);
+            tcpListener = new ServerTCPListener(port, store, synchronizer);
         } catch (IOException e) {
             System.out.println("Cannot initialize TCP Handler. Exit store");
             e.printStackTrace();
             return;
         }
 
-        Thread tcpHandlerThread = new Thread(tcpHandler);
+        LinkedList<Thread> tasks = new LinkedList<>();
 
+        Thread tcpListenerThread = new Thread(tcpListener);
         try {
-            tcpHandlerThread.start();
+            tcpListenerThread.start();
         } catch (Exception e) {
             System.out.println("Cannot run store TCP handler thread. Exit store");
             e.printStackTrace();
@@ -89,10 +90,14 @@ public class Server implements Runnable {
         }
 
         try {
-            tcpHandlerThread.join();
+            tcpListenerThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private  void connectToServers() {
 
     }
 

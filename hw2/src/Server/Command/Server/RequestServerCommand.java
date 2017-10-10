@@ -1,16 +1,23 @@
 package Server.Command.Server;
 
+import Server.Synchronize.ServerSynchronizer;
+
 import java.net.Socket;
 
 public class RequestServerCommand extends ServerCommand {
 
-    public RequestServerCommand(Socket clientSocket, int serverId, long clockValue) {
-        super(clientSocket, serverId, clockValue);
+    public RequestServerCommand(String[] tokens, Socket clientSocket, ServerSynchronizer synchronizer, Direction cmdDirection) {
+        super(tokens, clientSocket, synchronizer, cmdDirection);
         cmd = "request";
     }
 
     @Override
-    public void executeServerCmd(String[] tokens) {
+    public void executeSending() {
+
+    }
+
+    @Override
+    public void executeReceiving() {
 
     }
 }

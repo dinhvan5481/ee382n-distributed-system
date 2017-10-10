@@ -44,6 +44,7 @@ public class ServerTCPListener implements Runnable {
 
             ServerTCPHandler serverTCPHandler = null;
             try {
+                incomingClientSocket.setKeepAlive(true);
                 serverTCPHandler = new ServerTCPHandler(incomingClientSocket, store, synchronizer);
             } catch (IOException e) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Error while creating TCP handler"));

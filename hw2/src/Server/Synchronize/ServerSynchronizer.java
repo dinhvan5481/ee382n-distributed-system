@@ -34,6 +34,19 @@ public class ServerSynchronizer {
         }
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public ServerInfo getServerInfo(int id) {
+        return servers.get(id);
+    }
+
+    public LogicalClock getLogicalClock() {
+        return logicalClock;
+    }
+
+    /*
     public void sendRequest() {
         long clockValue = logicalClock.tick();
         currentRequest = new ServerRequest(id, clockValue);
@@ -81,18 +94,14 @@ public class ServerSynchronizer {
 
         //TODO: need to dertermine if we can enter CS
     }
+*/
 
-
-    private void sendCommand(ServerInfo info, ServerCommand command) {
-
-    }
-
-    private void broadcast(ServerCommand command) {
-        for (ServerInfo serverInfo :
-                servers.values()) {
-            if (!serverInfo.isMe(id) && serverInfo.isOnline()) {
-                sendCommand(serverInfo, command);
-            }
-        }
+    public void broadcast(ServerCommand command) {
+//        for (ServerInfo serverInfo :
+//                servers.values()) {
+//            if (!serverInfo.isMe(id) && serverInfo.isOnline()) {
+//                sendCommand(serverInfo, command);
+//            }
+//        }
     }
 }

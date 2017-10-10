@@ -7,17 +7,18 @@ import java.net.Socket;
 
 public class SearchClientCommand extends ClientCommand {
 
-    public SearchClientCommand(Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(clientSocket, store, synchronizer);
+    public SearchClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, clientSocket, store, synchronizer);
     }
 
     @Override
-    public String executeClientCmd(String[] tokens) {
+    public void execute() {
         String name;
+        String response;
         if (tokens.length != 2) {
-            return "Usage:\nsearch <name>\n";
+            response = "Usage:\nsearch <name>\n";
         }
         name = tokens[1];
-        return store.search(name);
+        response = store.search(name);
     }
 }

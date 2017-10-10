@@ -1,12 +1,14 @@
 package Server.Command.Server;
 
+import Server.Synchronize.ServerSynchronizer;
+
 import java.net.Socket;
 
 public class ReleaseServerCommand extends ServerCommand {
 
 
-    public ReleaseServerCommand(Socket clientSocket, int serverId, long clockValue) {
-        super(clientSocket, serverId, clockValue);
+    public ReleaseServerCommand(String[] tokens, Socket clientSocket, ServerSynchronizer synchronizer, Direction cmdDirection) {
+        super(tokens, clientSocket, synchronizer, cmdDirection);
         cmd = "release";
     }
 
@@ -15,7 +17,12 @@ public class ReleaseServerCommand extends ServerCommand {
     }
 
     @Override
-    public void executeServerCmd(String[] tokens) {
+    public void executeSending() {
+
+    }
+
+    @Override
+    public void executeReceiving() {
 
     }
 }

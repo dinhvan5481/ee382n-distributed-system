@@ -1,15 +1,15 @@
 package Server.Utils;
 
 import Server.BookKeeper;
-import Server.Command.Client.BookSeatClientCommand;
-import Server.Command.Client.DeleteClientCommand;
-import Server.Command.Client.ReserveClientCommand;
-import Server.Command.Client.SearchClientCommand;
+import Server.Command.Client.*;
 import Server.Command.Command;
 import Server.Command.NullCommand;
 import Server.Synchronize.ServerSynchronizer;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.Socket;
 
 public class ServerTCPHandler extends Thread {
@@ -37,7 +37,8 @@ public class ServerTCPHandler extends Thread {
             while ((cmdFromClient = inputStream.readLine()) != null) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Received from client: %s", cmdFromClient));
                 Command result = parseServerInput(store, cmdFromClient);
-//                result.execute();
+                result.setOutputStream(outputStream);
+                result.execute();
             }
         } catch (IOException e) {
             logger.log(Logger.LOG_LEVEL.INFO, "Connection with client ended.");
@@ -65,23 +66,22 @@ public class ServerTCPHandler extends Thread {
 
         switch (command) {
             case "reserve":
-                return new ReserveClientCommand(clientSocket, store, synchronizer);
+                return new ReserveClientCommand(tokens, clientSocket, store, synchronizer);
 
             case "bookseat":
-                return new BookSeatClientCommand(clientSocket, store, synchronizer);
-
+                return new BookSeatClientCommand(tokens, clientSocket, store, synchronizer);
 
             case "delete":
-                return new DeleteClientCommand(clientSocket, store, synchronizer);
+                return new DeleteClientCommand(tokens, clientSocket, store, synchronizer);
 
             case "search":
-                return new SearchClientCommand(clientSocket, store, synchronizer);
+                return new SearchClientCommand(tokens, clientSocket, store, synchronizer);
 
             case "join":
-
+                return new ReceivedJoinServerCommand(tokens, clientSocket, synchronizer);
 
             default:
-                return new NullCommand(clientSocket);
+                return new NullCommand();
         }
     }
 }

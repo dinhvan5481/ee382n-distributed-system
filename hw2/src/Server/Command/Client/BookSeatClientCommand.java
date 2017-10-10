@@ -5,19 +5,20 @@ import Server.Synchronize.ServerSynchronizer;
 import java.net.Socket;
 
 public class BookSeatClientCommand extends ClientCommand {
-    public BookSeatClientCommand(Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(clientSocket, store, synchronizer);
+    public BookSeatClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, clientSocket, store, synchronizer);
     }
 
     @Override
-    public String executeClientCmd(String[] tokens) {
+    public void execute() {
         String name;
+        String response;
         int seatNumber;
         if (tokens.length != 3) {
-            return "Usage:\nbookSeat <name> <seatNum>\n";
+            response = "Usage:\nbookSeat <name> <seatNum>\n";
         }
         name =  tokens[1];
         seatNumber = Integer.parseInt(tokens[2]);
-        return store.bookSeat(name, seatNumber);
+        response = store.bookSeat(name, seatNumber);
     }
 }

@@ -6,11 +6,15 @@ import Server.Synchronize.LogicalClock;
 import Server.Synchronize.ServerSynchronizer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.HashMap;
 
 public class SystemInfo {
+
+
     private int myId;
     private HashMap<Integer, ServerInfo> servers;
     private LogicalClock logicalClock;
@@ -39,7 +43,4 @@ public class SystemInfo {
         return myId;
     }
 
-    public void setTCPSocket(Socket socket) {
-        this.clientSocket = socket;
-    }
 }
