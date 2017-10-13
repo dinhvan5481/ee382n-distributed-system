@@ -10,13 +10,6 @@ public class AckServerCommand extends ServerCommand {
     }
 
     @Override
-    public String executeSending() {
-        long clockValue = synchronizer.getLogicalClock().tick();
-        String cmd = buildSendingCmd();
-        return cmd;
-    }
-
-    @Override
     public void executeReceiving() {
         synchronizer.getLogicalClock().tick(sendingServerClockValue);
         //

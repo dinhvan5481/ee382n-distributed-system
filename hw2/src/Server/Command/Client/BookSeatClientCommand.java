@@ -10,7 +10,7 @@ public class BookSeatClientCommand extends ClientCommand {
     }
 
     @Override
-    public void execute() {
+    public void executeReceiving() {
         String name;
         String response;
         int seatNumber;

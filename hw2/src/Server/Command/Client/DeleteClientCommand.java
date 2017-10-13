@@ -11,7 +11,7 @@ public class DeleteClientCommand extends ClientCommand {
     }
 
     @Override
-    public void execute() {
+    public void executeReceiving() {
         String name;
         String response;
         if (tokens.length != 2) {

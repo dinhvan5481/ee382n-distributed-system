@@ -16,8 +16,6 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 public class BackEndServerConnection implements ITCPConnection {
-
-    private int id;
     private ServerSynchronizer serverSynchronizer;
     private ServerInfo neighborServer;
 
@@ -65,7 +63,7 @@ public class BackEndServerConnection implements ITCPConnection {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format( "Server %d -  Received from neighbor server: %s",
                         serverSynchronizer.getId(), cmdFromNeighborServer));
                 Command result = parseServerInput(cmdFromNeighborServer);
-                result.execute();
+                result.executeReceivingCmd();
             }
 
         } catch (IOException e) {
@@ -79,6 +77,7 @@ public class BackEndServerConnection implements ITCPConnection {
     }
 
     public void sendTCPMessage(String message) {
+        logSendingCmd(message);
         outputStream.println(message);
         outputStream.flush();
     }
@@ -90,13 +89,13 @@ public class BackEndServerConnection implements ITCPConnection {
     private ServerCommand parseServerInput(String cmd) {
         String[] tokens = cmd.split(" ");
         String cmdToken = tokens[0];
-        switch (cmdToken) {
-            case "ackjoin:
-                return new AckJoinServerCommand(tokens, serverSynchronizer, ServerCommand.Direction.Receiving);
-
-            default:
-                return new NullServerCommand();
-
+        if(cmdToken.equals(ServerCommand.ACK_JOIN_CMD)) {
+            return new AckJoinServerCommand(tokens, serverSynchronizer, ServerCommand.Direction.Receiving);
+        } else {
+            return new NullServerCommand();
         }
+    }
+    protected void logSendingCmd(String cmd) {
+        logger.log(Logger.LOG_LEVEL.DEBUG, serverSynchronizer.toString() + " send message: " + cmd + " to server " + neighborServer.getId());
     }
 }

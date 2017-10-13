@@ -2,6 +2,7 @@ package Server.Synchronize;
 
 import Server.BookKeeper;
 import Server.Command.Server.JoinServerCommand;
+import Server.Command.Server.RequestServerCommand;
 import Server.Command.Server.ServerCommand;
 import Server.Core.*;
 import Server.Server;
@@ -90,6 +91,19 @@ public class ServerSynchronizer implements Runnable {
     public void sendCommandTo(int targetServerId, ServerCommand cmd) {
         ITCPConnection itcpConnection = tcpCnnHashMap.get(targetServerId);
         itcpConnection.sendCommand(cmd);
+    }
+
+    public void requestCS() {
+        ServerCommand requestCmd = new RequestServerCommand(null, this, ServerCommand.Direction.Sending);
+        broadcastCommand(requestCmd);
+    }
+
+    private void broadcastCommand(ServerCommand cmd) {
+        servers.values().parallelStream().forEach(serverInfo -> {
+            if(!serverInfo.isMe(id)) {
+                sendCommandTo(serverInfo.getId(), cmd);
+            }
+        });
     }
     /*
     public void sendRequest() {
@@ -252,6 +266,7 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public void syncStore() {
+        requestCS();
 
     }
 }

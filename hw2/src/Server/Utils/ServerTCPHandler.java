@@ -42,7 +42,7 @@ public class ServerTCPHandler implements ITCPConnection {
             while ((cmdFromClient = inputStream.readLine()) != null) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Server %d -  Received from client: %s", synchronizer.getId(), cmdFromClient));
                 Command result = parseServerInput(store, cmdFromClient);
-                result.execute();
+                result.executeReceivingCmd();
             }
         } catch (IOException e) {
             logger.log(Logger.LOG_LEVEL.INFO, "Connection with client ended.");

@@ -13,19 +13,12 @@ public class AckJoinServerCommand extends ServerCommand {
     }
 
     @Override
-    public String executeSending() {
-        long clockValue = synchronizer.getLogicalClock().tick();
-        String cmd = buildSendingCmd();
-        logger.log(Logger.LOG_LEVEL.DEBUG, cmd);
-        return cmd;
-    }
-
-    @Override
     public void executeReceiving() {
         synchronizer.getLogicalClock().tick(sendingServerClockValue);
         ServerInfo.ServerState sendingServerState = ServerInfo.ServerState.valueOf(additionalInfos.get(0));
         synchronizer.getServerInfo(sendingServerid).setServerState(sendingServerState);
         if(sendingServerState == ServerInfo.ServerState.READY) {
+            logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + ": server " + sendingServerid + " in READY STATE" );
             //Start sync process
             synchronizer.syncStore();
         } else if(sendingServerState == ServerInfo.ServerState.JOIN) {

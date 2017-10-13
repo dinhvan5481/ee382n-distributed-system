@@ -14,8 +14,8 @@ public class JoinServerCommand extends ServerCommand {
         cmd = ServerCommand.JOIN_CMD;
     }
 
-    @Override
-    protected String executeSending() {
+//    @Override
+//    protected String executeSending() {
 //        long clockValue = synchronizer.getLogicalClock().tick();
 //        String cmd = buildSendingCmd();
 //
@@ -38,11 +38,11 @@ public class JoinServerCommand extends ServerCommand {
 //            }
 //        }
 //        return cmd;
-        return "";
-    }
+//        return "";
+//    }
 
     @Override
-    protected void executeReceiving() {
+    public void executeReceiving() {
         synchronizer.getLogicalClock().tick(sendingServerClockValue);
         ServerInfo serverInfo = synchronizer.getServerInfo(sendingServerid);
         serverInfo.setServerState(ServerInfo.ServerState.JOIN);

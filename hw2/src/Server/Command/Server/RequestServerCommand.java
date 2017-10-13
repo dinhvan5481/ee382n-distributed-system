@@ -11,22 +11,10 @@ public class RequestServerCommand extends ServerCommand {
     }
 
     @Override
-    protected String executeSending() {
-//        long clockValue = synchronizer.getLogicalClock().tick();
-//        ServerRequest request = new ServerRequest(serverId, clockValue);
-//        synchronizer.setCurrentRequest(request);
-//        String cmd = buildSendingCmd();
-//        return cmd;
-        return "";
-    }
-
-    @Override
     protected void executeReceiving() {
-        synchronizer.getLogicalClock().tick(sendingServerClockValue);
         ServerRequest request = new ServerRequest(sendingServerid, sendingServerClockValue);
         synchronizer.addRequestToList(request);
-
-
-
+        ServerCommand ackServerCmd = new AckServerCommand(null, synchronizer, Direction.Sending);
+        synchronizer.sendCommandTo(sendingServerid, ackServerCmd);
     }
 }

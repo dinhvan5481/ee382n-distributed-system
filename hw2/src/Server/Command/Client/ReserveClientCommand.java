@@ -11,14 +11,19 @@ public class ReserveClientCommand extends ClientCommand {
         super(tokens, store, synchronizer);
     }
 
+//    @Override
+//    public void execute() {
+//        String name;
+//        String response;
+//        if (tokens.length != 2) {
+//            response = "Usage:\nreserve <name>\n";
+//        }
+//        name = tokens[1];
+//        response = store.reserve(name);
+//    }
+
     @Override
-    public void execute() {
-        String name;
-        String response;
-        if (tokens.length != 2) {
-            response = "Usage:\nreserve <name>\n";
-        }
-        name = tokens[1];
-        response = store.reserve(name);
+    protected void executeReceiving() {
+
     }
 }

@@ -14,16 +14,6 @@ public class ReleaseServerCommand extends ServerCommand {
     }
 
     @Override
-    public String executeSending() {
-        long clockValue = synchronizer.getLogicalClock().tick();
-        ServerRequest request = synchronizer.getCurrentRequest();
-        LinkedList<String> additionInfo = new LinkedList<>();
-        additionInfo.add("" + request   .getClockValue());
-        String cmd = buildSendingCmd();
-        return cmd;
-    }
-
-    @Override
     public void executeReceiving() {
         synchronizer.getLogicalClock().tick(sendingServerClockValue);
 

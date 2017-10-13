@@ -13,9 +13,7 @@ public abstract class ClientCommand extends Command {
     protected ServerSynchronizer synchronizer;
 
     public ClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, synchronizer);
-        this.store = store;
-        this.synchronizer = synchronizer;
+        super(tokens, synchronizer, Direction.Receiving);
         type = CommandType.Client;
     }
 

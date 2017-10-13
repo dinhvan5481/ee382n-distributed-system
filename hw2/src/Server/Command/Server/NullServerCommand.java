@@ -10,11 +10,6 @@ public class NullServerCommand extends ServerCommand {
     }
 
     @Override
-    public String executeSending() {
-        return "null";
-    }
-
-    @Override
     public void executeReceiving() {
 
     }
