@@ -1,6 +1,7 @@
 import Server.Server;
 
 import java.io.*;
+import java.util.LinkedList;
 
 public class Simulator {
 
@@ -41,25 +42,26 @@ public class Simulator {
         File[] client_files = client_input.listFiles();
         File[] server_files = servers_input.listFiles();
 
-        Thread[] threads = new Thread[client_files.length + server_files.length];
+        LinkedList<Thread> threads = new LinkedList<>();
         int i = 0;
 
 
         for (File file : client_files) {
             String fileOutPath = String.format("%s%s%s", outputDir, File.separator, file.getName().replaceFirst("(.*)[.][^.]+$", "$1.out"));
-
-            threads[i] = createClientThread(file.getPath(), fileOutPath);
-            threads[i].start();
-            i++;
+            Thread clientThread = createClientThread(file.getPath(), fileOutPath);
+            threads.add(clientThread);
+            clientThread.start();
             System.out.println(file.getAbsolutePath());
         }
 
         for (File file : server_files) {
+            if(file.getName().contains("server1")) {
+                continue;
+            }
             String fileOutPath = String.format("%s%s%s", outputDir, File.separator, file.getName().replaceFirst("(.*)[.][^.]+$", "$1.out"));
-
-            threads[i] = createServerThread(file.getPath(), fileOutPath);
-            threads[i].start();
-            i++;
+            Thread serverThread = createServerThread(file.getPath(), fileOutPath);
+            threads.add(serverThread);
+            serverThread.start();
             System.out.println(file.getAbsolutePath());
         }
 

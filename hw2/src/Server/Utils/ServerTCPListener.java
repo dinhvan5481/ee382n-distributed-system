@@ -24,6 +24,7 @@ public class ServerTCPListener implements Runnable {
         this.store = store;
         this.synchronizer = synchronizer;
         logger = new Logger(Logger.LOG_LEVEL.DEBUG);
+        logger.log(Logger.LOG_LEVEL.DEBUG, "Store of server " + synchronizer.getId() + " up");
     }
 
     @Override
@@ -51,7 +52,8 @@ public class ServerTCPListener implements Runnable {
                 e.printStackTrace();
                 continue;
             }
-            serverTCPHandler.start();
+            Thread tcpConnThread = new Thread(serverTCPHandler);
+            tcpConnThread.start();
         }
     }
 }

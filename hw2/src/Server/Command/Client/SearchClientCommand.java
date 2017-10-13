@@ -7,8 +7,8 @@ import java.net.Socket;
 
 public class SearchClientCommand extends ClientCommand {
 
-    public SearchClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, clientSocket, store, synchronizer);
+    public SearchClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, store, synchronizer);
     }
 
     @Override

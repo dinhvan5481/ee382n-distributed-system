@@ -7,8 +7,8 @@ import java.net.Socket;
 
 public class ReserveClientCommand extends ClientCommand {
 
-    public ReserveClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, clientSocket, store, synchronizer);
+    public ReserveClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, store, synchronizer);
     }
 
     @Override

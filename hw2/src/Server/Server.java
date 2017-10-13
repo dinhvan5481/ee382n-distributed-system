@@ -5,6 +5,7 @@ import Server.Core.ServerInfo;
 import Server.Core.SystemInfo;
 import Server.Synchronize.LogicalClock;
 import Server.Synchronize.ServerSynchronizer;
+import Server.Utils.Logger;
 import Server.Utils.ServerTCPListener;
 
 import java.io.IOException;
@@ -23,8 +24,10 @@ public class Server implements Runnable {
     PrintStream output;
     private int serverId;
 
+    private Logger logger;
     public Server() {
         this(System.in, System.out);
+        logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
 
     public Server(InputStream input, PrintStream output) {
@@ -35,7 +38,6 @@ public class Server implements Runnable {
     @Override
     public void run() {
         Scanner stdIn = new Scanner(input);
-
 
         int serverId = Integer.parseInt(stdIn.next());
         int nServers = Integer.parseInt(stdIn.next());
@@ -51,7 +53,7 @@ public class Server implements Runnable {
         LogicalClock logicalClock = new LogicalClock();
         BookKeeper store = new BookKeeper(seats);
         SystemInfo systemInfo = new SystemInfo(serverId, logicalClock);
-        ServerSynchronizer synchronizer = new ServerSynchronizer(serverId, logicalClock);
+        ServerSynchronizer synchronizer = new ServerSynchronizer(serverId, logicalClock, store);
 
         List<Integer> neighboorServers = new LinkedList<>();
 
@@ -77,41 +79,57 @@ public class Server implements Runnable {
             }
         }
 
-        ServerTCPListener tcpListener;
+        Thread synchronizeThread = new Thread(synchronizer);
         try {
-            tcpListener = new ServerTCPListener(port, store, synchronizer);
-        } catch (IOException e) {
-            System.out.println("Cannot initialize TCP Handler. Exit store");
-            e.printStackTrace();
-            return;
-        }
-
-        LinkedList<Thread> tasks = new LinkedList<>();
-
-        for (Integer neiboorServerId :
-                neighboorServers) {
-            tasks.add(new Thread(new BackEndServerConnection(serverId, synchronizer, neiboorServerId)));
-        }
-
-        Thread tcpListenerThread = new Thread(tcpListener);
-        tasks.add(tcpListenerThread);
-        try {
-            for (Thread thread : tasks) {
-                thread.start();
-            }
+            synchronizeThread.start();
         } catch (Exception e) {
-            System.out.println("Cannot run store TCP handler thread. Exit store");
+            logger.log(Logger.LOG_LEVEL.INFO, "Failed to start sync thread - server " + serverId);
             e.printStackTrace();
-            return;
         }
 
         try {
-            for (Thread thread : tasks) {
-                thread.join();
-            }
+            synchronizeThread.join();
         } catch (InterruptedException e) {
+            logger.log(Logger.LOG_LEVEL.INFO, "Server " + serverId + "stopped");
             e.printStackTrace();
         }
+//        ServerTCPListener tcpListener;
+//        try {
+//            tcpListener = new ServerTCPListener(port, store, synchronizer);
+//        } catch (IOException e) {
+//            System.out.println("Cannot initialize TCP Handler. Exit store");
+//            e.printStackTrace();
+//            return;
+//        }
+
+//        LinkedList<Thread> tasks = new LinkedList<>();
+//
+//        for (Integer neiboorServerId :
+//                neighboorServers) {
+//            tasks.add(new Thread(new BackEndServerConnection(serverId, synchronizer, neiboorServerId)));
+//        }
+//
+//        Thread tcpListenerThread = new Thread(tcpListener);
+//        Thread synchronizeThread = new Thread(synchronizer);
+//        tasks.add(tcpListenerThread);
+//        tasks.add(synchronizeThread);
+//        try {
+//            for (Thread thread : tasks) {
+//                thread.start();
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Cannot run store TCP handler thread. Exit store");
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        try {
+//            for (Thread thread : tasks) {
+//                thread.join();
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

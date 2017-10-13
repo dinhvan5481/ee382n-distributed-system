@@ -5,8 +5,8 @@ import Server.Synchronize.ServerSynchronizer;
 import java.net.Socket;
 
 public class BookSeatClientCommand extends ClientCommand {
-    public BookSeatClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, clientSocket, store, synchronizer);
+    public BookSeatClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, store, synchronizer);
     }
 
     @Override

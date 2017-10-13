@@ -1,26 +1,35 @@
 package Server.Command.Server;
 
+import Server.Core.ServerInfo;
+import Server.Server;
 import Server.Synchronize.ServerSynchronizer;
-
-import java.net.Socket;
+import Server.Utils.Logger;
 
 public class AckJoinServerCommand extends ServerCommand {
-    protected AckJoinServerCommand(String[] tokens, Socket clientSocket, ServerSynchronizer synchronizer, Direction cmdDirection) {
-        super(tokens, clientSocket, synchronizer, cmdDirection);
-        cmd = "ackjoin";
+
+    public AckJoinServerCommand(String[] tokens, ServerSynchronizer synchronizer, Direction cmdDirection) {
+        super(tokens, synchronizer, cmdDirection);
+        cmd = ServerCommand.ACK_JOIN_CMD;
     }
 
     @Override
-    public void executeSending() {
+    public String executeSending() {
         long clockValue = synchronizer.getLogicalClock().tick();
-        String cmd = buildSendingCmd(clockValue, null);
-        sendTCPMessage(cmd);
+        String cmd = buildSendingCmd();
+        logger.log(Logger.LOG_LEVEL.DEBUG, cmd);
+        return cmd;
     }
 
     @Override
     public void executeReceiving() {
-        //Start sync process here
-        synchronizer.getLogicalClock().tick(receivedClockValue);
-
+        synchronizer.getLogicalClock().tick(sendingServerClockValue);
+        ServerInfo.ServerState sendingServerState = ServerInfo.ServerState.valueOf(additionalInfos.get(0));
+        synchronizer.getServerInfo(sendingServerid).setServerState(sendingServerState);
+        if(sendingServerState == ServerInfo.ServerState.READY) {
+            //Start sync process
+            synchronizer.syncStore();
+        } else if(sendingServerState == ServerInfo.ServerState.JOIN) {
+            // determine who has smallest id, will be the server in ready state
+        }
     }
 }

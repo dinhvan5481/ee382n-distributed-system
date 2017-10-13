@@ -6,8 +6,8 @@ import Server.Synchronize.ServerSynchronizer;
 import java.net.Socket;
 
 public class DeleteClientCommand extends ClientCommand {
-    public DeleteClientCommand(String[] tokens, Socket clientSocket, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, clientSocket, store, synchronizer);
+    public DeleteClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
+        super(tokens, store, synchronizer);
     }
 
     @Override

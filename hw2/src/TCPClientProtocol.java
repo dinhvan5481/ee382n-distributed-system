@@ -74,8 +74,7 @@ public class  TCPClientProtocol{
         return response;
     }
 
-    private void sendMessage(String message) {
-
+    public void sendMessage(String message) {
         tcpOutputStream.println(message);
         tcpOutputStream.flush();
     }

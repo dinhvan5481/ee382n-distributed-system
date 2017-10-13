@@ -1,5 +1,6 @@
 package Server.Command;
 
+import Server.Synchronize.ServerSynchronizer;
 import Server.Utils.Logger;
 
 import java.io.BufferedReader;
@@ -22,8 +23,7 @@ public abstract class Command {
 
     protected Logger logger;
 
-    protected Command(String[] tokens, Socket clientSocket) {
-        this.clientSocket = clientSocket;
+    protected Command(String[] tokens, ServerSynchronizer serverSynchronizer) {
         this.tokens = tokens;
         logger = new Logger(Logger.LOG_LEVEL.DEBUG);
     }
@@ -33,24 +33,4 @@ public abstract class Command {
     }
 
     public abstract void execute();
-
-    public void setSocket(Socket socket) throws IOException {
-        this.clientSocket = socket;
-    }
-
-
-    public void setOutputStream(PrintStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
-    public void setInputStream(BufferedReader inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    protected void sendTCPMessage(String message) {
-        if(clientSocket.isConnected() && !clientSocket.isOutputShutdown()) {
-            outputStream.println(message);
-            outputStream.flush();
-        }
-    }
 }
