@@ -60,6 +60,9 @@ public class BackEndServerConnection implements ITCPConnection {
                         serverSynchronizer.getId(), cmdFromNeighborServer));
 
                 Command result = Command.parseCommand(cmdFromNeighborServer, serverSynchronizer);
+                if(result.getCommandType() == Command.CommandType.Null) {
+                    continue;
+                }
                 result.executeReceivingCmd();
             }
 

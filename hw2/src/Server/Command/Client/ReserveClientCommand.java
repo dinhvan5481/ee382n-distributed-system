@@ -16,7 +16,7 @@ public class ReserveClientCommand extends ClientCommand {
         String name;
         String response;
         if (tokens.length != 2) {
-            response = "Usage:\nreserve <name>\n";
+           return "Usage:\nreserve <name>\n";
         }
         name = tokens[1];
         response = store.reserve(name);

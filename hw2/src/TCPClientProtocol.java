@@ -15,7 +15,7 @@ public class  TCPClientProtocol{
     private Socket tcpSocket;
     private PrintStream tcpOutputStream;
     private Scanner tcpInputStream;
-    private final int TIME_OUT = 100;
+    private final int TIME_OUT = 1000;
 
     private Logger logger;
 
@@ -38,8 +38,8 @@ public class  TCPClientProtocol{
                     tcpOutputStream = new PrintStream(this.tcpSocket.getOutputStream());
                     tcpInputStream = new Scanner(this.tcpSocket.getInputStream());
                 } catch (IOException ioe) {
-                    System.err.printf("Error connecting to: %s:%s\n", serverInfo);
-                    System.err.println(ioe);
+//                    System.err.printf("Error connecting to: %s:%s\n", serverInfo);
+//                    System.err.println(ioe);
                     clearConnection();
                 }
             }
@@ -63,10 +63,10 @@ public class  TCPClientProtocol{
             try {
                 response = tcpInputStream.nextLine();
             } catch (NoSuchElementException nse) {
-                System.err.println(nse);
+//                System.err.println(nse);
                 clearConnection();
             } catch (IllegalStateException ise) {
-                System.err.println(ise);
+//                System.err.println(ise);
                 clearConnection();
             }
         }

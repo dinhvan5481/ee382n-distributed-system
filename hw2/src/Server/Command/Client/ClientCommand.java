@@ -15,8 +15,8 @@ public abstract class ClientCommand extends Command {
     public static String DELETE_CMD = "delete";
     public static String SEARCH_CMD = "search";
 
+
     protected BookKeeper store;
-    protected ServerSynchronizer synchronizer;
     private ITCPConnection tcpConnection;
 
     public ClientCommand(String[] tokens, ServerSynchronizer synchronizer) {

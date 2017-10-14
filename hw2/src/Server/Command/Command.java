@@ -19,13 +19,16 @@ import java.util.List;
 public abstract class Command {
     public static enum CommandType {
         Client,
-        Server
+        Server,
+        Null
     }
 
     public enum Direction {
         Receiving,
         Sending
     }
+
+    public static String NULL_CMD = "null";
 
     protected int serverId;
     protected CommandType type;
@@ -45,6 +48,7 @@ public abstract class Command {
         this.type = type;
         this.cmdDirection = cmdDirection;
         additionalInfos = new LinkedList<>();
+        this.tokens = tokens;
         if(cmdDirection == ServerCommand.Direction.Receiving && getCommandType().equals(CommandType.Server)) {
             if(tokens != null && tokens.length >= 3) {
                 this.cmd = tokens[0];
@@ -116,7 +120,7 @@ public abstract class Command {
         } else if (command.equals(ServerCommand.SYNC_RESPONSE_CMD)) {
             return new SyncResponseServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
         } else {
-            return new NullCommand();
+            return new NullCommand(tokens, synchronizer);
         }
 
     }

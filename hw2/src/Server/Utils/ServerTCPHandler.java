@@ -43,6 +43,9 @@ public class ServerTCPHandler implements ITCPConnection {
             while ((cmdFromClient = inputStream.readLine()) != null) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format("Server %d -  Received from client: %s", synchronizer.getId(), cmdFromClient));
                 Command result = Command.parseCommand(cmdFromClient, synchronizer);
+                if(result.getCommandType() == Command.CommandType.Null) {
+                    continue;
+                }
                 if(result.getCommandType() == Command.CommandType.Server) {
                     int sendingServerId = result.getSendingServerid();
                     this.neighborServer = synchronizer.getServerInfo(sendingServerId);
@@ -76,7 +79,10 @@ public class ServerTCPHandler implements ITCPConnection {
     }
 
     protected void logSendingCmd(String cmd) {
-        logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + " send message: " + cmd + " to server " + neighborServer.getId());
+        if(neighborServer != null) {
+            logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + " send message: " + cmd + " to server " + neighborServer.getId());
+        }
+
     }
 
 }

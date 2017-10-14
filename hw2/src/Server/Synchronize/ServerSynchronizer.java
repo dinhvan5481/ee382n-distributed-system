@@ -1,6 +1,7 @@
 package Server.Synchronize;
 
 import Server.BookKeeper;
+import Server.Command.Client.ClientCommand;
 import Server.Command.Command;
 import Server.Command.Server.*;
 import Server.Core.*;
@@ -81,7 +82,7 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public ServerRequest getMyCurrentRequest() {
-        return currentRequest;
+        return getMyMinRequest();
     }
 
     public void setMyState(ServerInfo.ServerState state) {
@@ -121,21 +122,26 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public void requestCS(ServerRequest request) {
+        if(request == null) {
+            return;
+        }
         requests.put(request.getClockValue(), request);
-
-            requestEnterCSState = RequestEnterCSState.INIT;
-            setMyCurrentRequest(request);
+        if(countNeighborServerInReadyState() > 0) {
             ServerCommand requestCmd = new RequestServerCommand(null, this, ServerCommand.Direction.Sending);
             broadcastCommand(requestCmd);
-
+        } else {
+            requestEnterCSState = RequestEnterCSState.OK;
+            ServerRequest minRequest = getMinRequest();
+            if(minRequest.getRequestedCmd().getCommandType() == Command.CommandType.Client) {
+                ((ClientCommand)request.getRequestedCmd()).executeInCS();
+            }
+        }
     }
 
     public void recordAck() {
         int numAck = numAcks.incrementAndGet();
         int noOfServerInReadyState = (int) servers.values().stream().filter(serverInfo -> !serverInfo.isMe(id) && serverInfo.getServerState() == ServerInfo.ServerState.READY).count();
-        int minRequestClock = servers.entrySet().stream().map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
-
-        if(numAck >= noOfServerInReadyState && requests.get(minRequestClock).isMine(id)) {
+        if(numAck >= noOfServerInReadyState && getMinRequest().isMine(id)) {
             requestEnterCSState = RequestEnterCSState.OK;
         }
     }
@@ -145,9 +151,14 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public void exitCS() {
-        ServerCommand release = new ReleaseServerCommand(null, this, Command.Direction.Sending);
         requestEnterCSState = RequestEnterCSState.NO_NEED;
-        broadcastCommand(release);
+        release();
+        if(countNeighborServerInReadyState() > 0) {
+            ServerCommand release = new ReleaseServerCommand(null, this, Command.Direction.Sending);
+            broadcastCommand(release);
+        } else {
+            requestCS(null);
+        }
         logCurrentStatus();
     }
 
@@ -286,6 +297,29 @@ public class ServerSynchronizer implements Runnable {
         logger.log(Logger.LOG_LEVEL.DEBUG, store.toString());
     }
 
+    private ServerRequest getMinRequest() {
+        long minRequestClock = requests.entrySet().stream().map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
+        return requests.get(minRequestClock);
+    }
+
+    private ServerRequest getMyMinRequest() {
+        long minRequestClock = requests.entrySet().stream()
+                .filter(entry -> entry.getValue().isMine(id))
+                .map(entry -> entry.getKey())
+                .min((k1, k2) -> Long.compare(k1, k2)).get();
+        return requests.get(minRequestClock);
+    }
+
+    private int countNeighborServerInReadyState() {
+        return (int) servers.values().stream().filter(serverInfo -> !serverInfo.isMe(id) && serverInfo.getServerState() == ServerInfo.ServerState.READY).count();
+    }
+
+    private void release() {
+        long minRequestClock = requests.entrySet().stream()
+                .filter(entry -> entry.getValue().isMine(id))
+                .map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
+        requests.remove(minRequestClock);
+    }
 }
 
     /*
