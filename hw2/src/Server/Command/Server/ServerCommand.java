@@ -13,6 +13,7 @@ public abstract class ServerCommand extends Command {
     public static String ACK_CMD = "ack";
     public static String RELEASE_CMD = "release";
     public static String INTERNAL_SYNC_CMD = "i_sync";
+    public static String SYNC_STATE_CMD = "sync_state";
 
 
     protected ServerCommand(String[] tokens, ServerSynchronizer synchronizer, Direction cmdDirection) {

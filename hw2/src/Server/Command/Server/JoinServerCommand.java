@@ -28,7 +28,7 @@ public class JoinServerCommand extends ServerCommand {
 //                result.execute();
 //            }
 //        } catch (IOException e) {
-//            synchronizer.getServerInfo(endpointServerId).setServerState(ServerInfo.ServerState.OFFLINE);
+//            synchronizer.getServerInfo(endpointServerId).setNeighborServerState(ServerInfo.ServerState.OFFLINE);
 //        } finally {
 //            try {
 //                clientSocket.close();

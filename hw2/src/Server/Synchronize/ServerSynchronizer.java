@@ -172,8 +172,13 @@ public class ServerSynchronizer implements Runnable {
     public void endSyncStore() {
         exitCS();
         setMyState(ServerInfo.ServerState.READY);
+        ServerCommand syncState = new SyncStateServerCommand(new String[]{getMyState().name()}, this, Command.Direction.Sending);
+        broadcastCommand(syncState);
     }
 
+    public void setNeighborServerState(int serverId, ServerInfo.ServerState state) {
+        getServerInfo(serverId).setServerState(state);
+    }
 
     @Override
     public void run() {

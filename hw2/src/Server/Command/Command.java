@@ -119,7 +119,10 @@ public abstract class Command {
             return new SyncRequestServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
         } else if (command.equals(ServerCommand.SYNC_RESPONSE_CMD)) {
             return new SyncResponseServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
-        } else {
+        } else if(command.equals(ServerCommand.SYNC_STATE_CMD)) {
+            return new SyncStateServerCommand(tokens, synchronizer, Direction.Receiving);
+        }
+        else {
             return new NullCommand(tokens, synchronizer);
         }
 

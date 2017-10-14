@@ -16,10 +16,9 @@ public class SyncResponseServerCommand extends ServerCommand {
 
     @Override
     protected void executeReceiving() {
-
         String syncStore = additionalInfos.get(0);
         if(!syncStore.equals("-1")) {
-            Pattern p = compile("(\\(\\d+,\\w+\\))");
+            Pattern p = compile("(\\((\\d+),(\\w+)\\))");
             Matcher matcher = p.matcher(syncStore);
             while (matcher.find()) {
                 int seatNum = Integer.parseInt(matcher.group(2));
