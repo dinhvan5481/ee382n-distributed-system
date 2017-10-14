@@ -1,13 +1,9 @@
 package Server.Core;
 
 import Server.Command.Command;
-import Server.Command.Server.AckJoinServerCommand;
-import Server.Command.Server.JoinServerCommand;
-import Server.Command.Server.NullServerCommand;
-import Server.Command.Server.ServerCommand;
+import Server.Command.Server.*;
 import Server.Synchronize.ServerSynchronizer;
 import Server.Utils.Logger;
-import Server.Utils.ServerTCPHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -62,7 +58,8 @@ public class BackEndServerConnection implements ITCPConnection {
             while ((cmdFromNeighborServer = inputStream.readLine()) != null) {
                 logger.log(Logger.LOG_LEVEL.INFO, String.format( "Server %d -  Received from neighbor server: %s",
                         serverSynchronizer.getId(), cmdFromNeighborServer));
-                Command result = parseServerInput(cmdFromNeighborServer);
+
+                Command result = Command.parseCommand(cmdFromNeighborServer, serverSynchronizer);
                 result.executeReceivingCmd();
             }
 
@@ -86,15 +83,6 @@ public class BackEndServerConnection implements ITCPConnection {
         sendTCPMessage(serverCommand.buildSendingCmd());
     }
 
-    private ServerCommand parseServerInput(String cmd) {
-        String[] tokens = cmd.split(" ");
-        String cmdToken = tokens[0];
-        if(cmdToken.equals(ServerCommand.ACK_JOIN_CMD)) {
-            return new AckJoinServerCommand(tokens, serverSynchronizer, ServerCommand.Direction.Receiving);
-        } else {
-            return new NullServerCommand();
-        }
-    }
     protected void logSendingCmd(String cmd) {
         logger.log(Logger.LOG_LEVEL.DEBUG, serverSynchronizer.toString() + " send message: " + cmd + " to server " + neighborServer.getId());
     }

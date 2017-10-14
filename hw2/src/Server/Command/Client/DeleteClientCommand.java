@@ -6,12 +6,12 @@ import Server.Synchronize.ServerSynchronizer;
 import java.net.Socket;
 
 public class DeleteClientCommand extends ClientCommand {
-    public DeleteClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, store, synchronizer);
+    public DeleteClientCommand(String[] tokens, ServerSynchronizer synchronizer) {
+        super(tokens, synchronizer);
     }
 
     @Override
-    public void executeReceiving() {
+    public String executeWhenInCS() {
         String name;
         String response;
         if (tokens.length != 2) {
@@ -19,5 +19,6 @@ public class DeleteClientCommand extends ClientCommand {
         }
         name = tokens[1];
         response = store.delete(name);
+        return response;
     }
 }

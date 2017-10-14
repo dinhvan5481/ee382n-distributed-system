@@ -1,7 +1,10 @@
 package Server.Command;
 
-import Server.Command.Server.ServerCommand;
+import Server.BookKeeper;
+import Server.Command.Client.*;
+import Server.Command.Server.*;
 import Server.Core.ServerInfo;
+import Server.Server;
 import Server.Synchronize.ServerSynchronizer;
 import Server.Utils.Logger;
 
@@ -36,12 +39,13 @@ public abstract class Command {
     protected ServerCommand.Direction cmdDirection;
 
     protected Logger logger;
-    protected Command(String[] tokens, ServerSynchronizer synchronizer, ServerCommand.Direction cmdDirection) {
+    protected Command(String[] tokens, ServerSynchronizer synchronizer, CommandType type,ServerCommand.Direction cmdDirection) {
         this.serverId = synchronizer.getId();
         this.synchronizer = synchronizer;
+        this.type = type;
         this.cmdDirection = cmdDirection;
         additionalInfos = new LinkedList<>();
-        if(cmdDirection == ServerCommand.Direction.Receiving && getCommandType() == CommandType.Server) {
+        if(cmdDirection == ServerCommand.Direction.Receiving && getCommandType().equals(CommandType.Server)) {
             if(tokens != null && tokens.length >= 3) {
                 this.cmd = tokens[0];
                 this.sendingServerid = Integer.parseInt(tokens[1]);
@@ -71,9 +75,48 @@ public abstract class Command {
 
     public final void executeReceivingCmd() {
         if(cmdDirection == Direction.Receiving) {
-            logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + ": receive " + tokens);
             synchronizer.getLogicalClock().tick(sendingServerClockValue);
             executeReceiving();
+        }
+
+    }
+
+    public int getSendingServerid() {
+        if(type == CommandType.Server && cmdDirection == Direction.Receiving) {
+            return sendingServerid;
+        } else {
+            return -1;
+        }
+    }
+
+    public static Command parseCommand(String input, ServerSynchronizer synchronizer) {
+        String[] tokens = input.split(" ");
+        String command = tokens[0].toLowerCase();
+
+        if (command.equals(ClientCommand.RESERVE_CMD)) {
+            return new ReserveClientCommand(tokens, synchronizer);
+        } else if (command.equals(ClientCommand.BOOK_SEAT_CMD)) {
+            return new BookSeatClientCommand(tokens, synchronizer);
+        } else if (command.equals(ClientCommand.DELETE_CMD)) {
+            return new DeleteClientCommand(tokens, synchronizer);
+        } else if (command.equals(ClientCommand.SEARCH_CMD)) {
+            return new SearchClientCommand(tokens, synchronizer);
+        } else if (command.equals(ServerCommand.JOIN_CMD)) {
+            return new JoinServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.REQUEST_CMD)) {
+            return new RequestServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.ACK_CMD)) {
+            return new AckServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.RELEASE_CMD)) {
+            return new ReleaseServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.ACK_JOIN_CMD)) {
+            return new AckJoinServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.SYNC_REQUEST_CMD)) {
+            return new SyncRequestServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else if (command.equals(ServerCommand.SYNC_RESPONSE_CMD)) {
+            return new SyncResponseServerCommand(tokens, synchronizer, ServerCommand.Direction.Receiving);
+        } else {
+            return new NullCommand();
         }
 
     }

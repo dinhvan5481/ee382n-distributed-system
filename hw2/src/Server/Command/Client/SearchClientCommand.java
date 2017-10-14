@@ -7,12 +7,12 @@ import java.net.Socket;
 
 public class SearchClientCommand extends ClientCommand {
 
-    public SearchClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, store, synchronizer);
+    public SearchClientCommand(String[] tokens, ServerSynchronizer synchronizer) {
+        super(tokens, synchronizer);
     }
 
     @Override
-    public void executeReceiving() {
+    protected String executeWhenInCS() {
         String name;
         String response;
         if (tokens.length != 2) {
@@ -20,5 +20,6 @@ public class SearchClientCommand extends ClientCommand {
         }
         name = tokens[1];
         response = store.search(name);
+        return response;
     }
 }

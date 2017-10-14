@@ -1,7 +1,6 @@
 package Server.Command.Server;
 
 import Server.Core.ServerInfo;
-import Server.Server;
 import Server.Synchronize.ServerSynchronizer;
 import Server.Utils.Logger;
 
@@ -20,7 +19,7 @@ public class AckJoinServerCommand extends ServerCommand {
         if(sendingServerState == ServerInfo.ServerState.READY) {
             logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + ": server " + sendingServerid + " in READY STATE" );
             //Start sync process
-            synchronizer.syncStore();
+            synchronizer.startSyncStore();
         } else if(sendingServerState == ServerInfo.ServerState.JOIN) {
             // determine who has smallest id, will be the server in ready state
         }

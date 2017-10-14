@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
  */
 public class BookKeeper {
     private ConcurrentHashMap<Integer, String> reservations;
-    private int availableSeats = 10;
+    private int availableSeats;
+
+    private BookKeeper() {}
 
     public BookKeeper(int availableSeats) {
         reservations = new ConcurrentHashMap<>();
@@ -87,12 +89,22 @@ public class BookKeeper {
         return String.format("%d\n", resFound);
     }
 
+    public String getCurrentReservations() {
+        StringBuilder sb = new StringBuilder();
+        reservations.entrySet().stream()
+                .forEach(entry -> {
+                    sb.append(String.format("(%d,%s)", entry.getKey(), entry.getValue()));
+                });
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        reservations.values()
-                .stream()
-                .forEach(i -> sb.append(String.format("%s\n", i.toString())));
+        reservations.entrySet().stream()
+                .forEach(entry -> sb.append(String.format("Seat %d reserved for %s\n",
+                        entry.getKey(), entry.getValue())));
+
         return sb.toString();
     }
 

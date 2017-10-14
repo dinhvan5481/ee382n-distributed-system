@@ -12,7 +12,8 @@ public class RequestServerCommand extends ServerCommand {
 
     @Override
     protected void executeReceiving() {
-        ServerRequest request = new ServerRequest(sendingServerid, sendingServerClockValue);
+        //TODO: need command to parse the input
+        ServerRequest request = new ServerRequest(sendingServerid, sendingServerClockValue, null);
         synchronizer.addRequestToList(request);
         ServerCommand ackServerCmd = new AckServerCommand(null, synchronizer, Direction.Sending);
         synchronizer.sendCommandTo(sendingServerid, ackServerCmd);

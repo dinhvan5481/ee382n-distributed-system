@@ -7,23 +7,19 @@ import java.net.Socket;
 
 public class ReserveClientCommand extends ClientCommand {
 
-    public ReserveClientCommand(String[] tokens, BookKeeper store, ServerSynchronizer synchronizer) {
-        super(tokens, store, synchronizer);
+    public ReserveClientCommand(String[] tokens, ServerSynchronizer synchronizer) {
+        super(tokens, synchronizer);
     }
 
-//    @Override
-//    public void execute() {
-//        String name;
-//        String response;
-//        if (tokens.length != 2) {
-//            response = "Usage:\nreserve <name>\n";
-//        }
-//        name = tokens[1];
-//        response = store.reserve(name);
-//    }
-
     @Override
-    protected void executeReceiving() {
-
+    protected String executeWhenInCS() {
+        String name;
+        String response;
+        if (tokens.length != 2) {
+            response = "Usage:\nreserve <name>\n";
+        }
+        name = tokens[1];
+        response = store.reserve(name);
+        return response;
     }
 }
