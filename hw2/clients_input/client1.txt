@@ -1,6 +1,8 @@
-2
+3
 127.0.0.1:8025
 127.0.0.1:8030
-reserve Bob
+127.0.0.1:8035
+reserve Bobsd
+reserve test12
 delete Mary
 search John
