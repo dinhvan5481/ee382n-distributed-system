@@ -58,6 +58,9 @@ public class ServerTCPHandler implements ITCPConnection {
         } catch (IOException e) {
             logger.log(Logger.LOG_LEVEL.INFO, "Connection with client ended.");
         } finally {
+            if(neighborServer != null) {
+                synchronizer.setNeighborServerState(neighborServer.getId(), ServerInfo.ServerState.OFFLINE);
+            }
             try {
                 clientSocket.close();
             } catch (IOException e) {

@@ -12,16 +12,13 @@ public class AckJoinServerCommand extends ServerCommand {
     }
 
     @Override
-    public void executeReceiving() {
-        synchronizer.getLogicalClock().tick(sendingServerClockValue);
+    protected void executeReceiving() {
         ServerInfo.ServerState sendingServerState = ServerInfo.ServerState.valueOf(additionalInfos.get(0));
-        synchronizer.getServerInfo(sendingServerid).setServerState(sendingServerState);
+        synchronizer.setNeighborServerState(sendingServerid, sendingServerState);
         if(sendingServerState == ServerInfo.ServerState.READY) {
             logger.log(Logger.LOG_LEVEL.DEBUG, synchronizer.toString() + ": server " + sendingServerid + " in READY STATE" );
             //Start sync process
             synchronizer.startSyncStore();
-        } else if(sendingServerState == ServerInfo.ServerState.JOIN) {
-            // determine who has smallest id, will be the server in ready state
         }
     }
 }

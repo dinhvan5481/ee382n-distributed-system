@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public abstract class Command {
     public static enum CommandType {
@@ -78,7 +79,7 @@ public abstract class Command {
     protected abstract void executeReceiving();
 
     public final void executeReceivingCmd() {
-        if(cmdDirection == Direction.Receiving) {
+        if(cmdDirection == Direction.Receiving && synchronizer.getMyState() == ServerInfo.ServerState.READY) {
             synchronizer.getLogicalClock().tick(sendingServerClockValue);
             executeReceiving();
         }
@@ -91,6 +92,20 @@ public abstract class Command {
         } else {
             return -1;
         }
+    }
+
+    public String[] getCmdTokens() {
+        return tokens;
+    }
+
+    @Override
+    public String toString() {
+        if(tokens != null) {
+            StringBuilder sb = new StringBuilder();
+            Stream.of(tokens).forEach(token -> sb.append(token + " "));
+            return sb.toString();
+        }
+        return "no tokens";
     }
 
     public static Command parseCommand(String input, ServerSynchronizer synchronizer) {

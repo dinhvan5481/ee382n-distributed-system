@@ -82,7 +82,7 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public ServerRequest getMyCurrentRequest() {
-        return getMyMinRequest();
+        return getMinRequestFromServer(id);
     }
 
     public void setMyState(ServerInfo.ServerState state) {
@@ -125,6 +125,7 @@ public class ServerSynchronizer implements Runnable {
         if(request == null) {
             return;
         }
+        logger.log(Logger.LOG_LEVEL.DEBUG, toString() + ": send request cmd for " + request.getRequestedCmd().toString());
         requests.put(request.getClockValue(), request);
         if(countNeighborServerInReadyState() > 0) {
             ServerCommand requestCmd = new RequestServerCommand(null, this, ServerCommand.Direction.Sending);
@@ -152,9 +153,23 @@ public class ServerSynchronizer implements Runnable {
 
     public void exitCS() {
         requestEnterCSState = RequestEnterCSState.NO_NEED;
-        release();
+        long minRequestClock = requests.entrySet().stream()
+                .filter(entry -> entry.getValue().isMine(id))
+                .map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
+        ServerRequest removedRequest = requests.remove(minRequestClock);
+
         if(countNeighborServerInReadyState() > 0) {
-            ServerCommand release = new ReleaseServerCommand(null, this, Command.Direction.Sending);
+            ServerRequest currentRequest = getMyCurrentRequest();
+            if(currentRequest == null) {
+
+            }
+            Command requestedCmd = removedRequest.getRequestedCmd();
+            ServerCommand release = null;
+            if(requestedCmd.getCommandType() == Command.CommandType.Client) {
+                release = new ReleaseServerCommand(requestedCmd.getCmdTokens(), this, Command.Direction.Sending);
+            } else {
+                release = new ReleaseServerCommand(null, this, Command.Direction.Sending);
+            }
             broadcastCommand(release);
         } else {
             requestCS(null);
@@ -177,7 +192,16 @@ public class ServerSynchronizer implements Runnable {
     }
 
     public void setNeighborServerState(int serverId, ServerInfo.ServerState state) {
+        logger.log(Logger.LOG_LEVEL.DEBUG, toString() + ": server " + serverId + " changing state to: " + state.name());
         getServerInfo(serverId).setServerState(state);
+    }
+
+    public void removeMinRequestFromServer(int serverId) {
+        ServerRequest request = getMinRequestFromServer(serverId);
+        if(request == null) {
+            return;
+        }
+        requests.remove(request.getClockValue());
     }
 
     @Override
@@ -216,50 +240,34 @@ public class ServerSynchronizer implements Runnable {
                     }
                 });
 
-
-
-        try {
-            Thread.sleep(2 * servers.values().size() * TIME_OUT);
-        } catch (InterruptedException e) {
-            logger.log(Logger.LOG_LEVEL.INFO, "Error while sleeping for waiting servers start up");
-            e.printStackTrace();
-            return;
-        }
-
-        logicalClock.tick();
-        logAllServerState();
-
         if(!servers.values().stream().anyMatch(serverInfo -> serverInfo.getServerState() == ServerInfo.ServerState.READY)) {
             setMyState(ServerInfo.ServerState.READY);
             logger.log(Logger.LOG_LEVEL.DEBUG, "Server " + id + " change to READY STATE - ready to spin store up");
             logLogicalClock();
-
-            ServerTCPListener tcpListener;
-            try {
-                tcpListener = new ServerTCPListener(getMyPort(), store, this);
-            } catch (IOException e) {
-                System.out.println("Cannot initialize TCP Handler. Exit store");
-                e.printStackTrace();
-                return;
-            }
-
-            //Spin store up
-            Thread tcpListenerThread = new Thread(tcpListener);
-            tasks.add(tcpListenerThread);
-            try {
-                tcpListenerThread.start();
-            } catch (Exception e) {
-                System.out.println("Cannot run store TCP handler thread. Exit store");
-                e.printStackTrace();
-                return;
-            }
-
-        } else {
-            logger.log(Logger.LOG_LEVEL.DEBUG, "Some server is in ready state, start sync process");
-            //TODO: start sync process
-
         }
 
+        ServerTCPListener tcpListener;
+        try {
+            tcpListener = new ServerTCPListener(getMyPort(), store, this);
+        } catch (IOException e) {
+            System.out.println("Cannot initialize TCP Handler. Exit store");
+            e.printStackTrace();
+            return;
+        }
+
+        //Spin store up
+        Thread tcpListenerThread = new Thread(tcpListener);
+        tasks.add(tcpListenerThread);
+        try {
+            tcpListenerThread.start();
+        } catch (Exception e) {
+            System.out.println("Cannot run store TCP handler thread. Exit store");
+            e.printStackTrace();
+            return;
+        }
+
+
+        logAllServerState();
         tasks.stream().forEach(task -> {
             try {
                 task.join();
@@ -302,14 +310,20 @@ public class ServerSynchronizer implements Runnable {
         logger.log(Logger.LOG_LEVEL.DEBUG, store.toString());
     }
 
-    private ServerRequest getMinRequest() {
+    public ServerRequest getMinRequest() {
+        if(requests.size() == 0) {
+            return null;
+        }
         long minRequestClock = requests.entrySet().stream().map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
         return requests.get(minRequestClock);
     }
 
-    private ServerRequest getMyMinRequest() {
+    private ServerRequest getMinRequestFromServer(int serverId) {
+        if(requests.size() == 0) {
+            return null;
+        }
         long minRequestClock = requests.entrySet().stream()
-                .filter(entry -> entry.getValue().isMine(id))
+                .filter(entry -> entry.getValue().getRequestedServerId() == serverId)
                 .map(entry -> entry.getKey())
                 .min((k1, k2) -> Long.compare(k1, k2)).get();
         return requests.get(minRequestClock);
@@ -320,10 +334,6 @@ public class ServerSynchronizer implements Runnable {
     }
 
     private void release() {
-        long minRequestClock = requests.entrySet().stream()
-                .filter(entry -> entry.getValue().isMine(id))
-                .map(entry -> entry.getKey()).min((k1, k2) -> Long.compare(k1, k2)).get();
-        requests.remove(minRequestClock);
     }
 }
 

@@ -16,9 +16,10 @@ public class AckServerCommand extends ServerCommand {
         synchronizer.recordAck();
         if(synchronizer.canEnterCS()) {
             Command requestedCommand = synchronizer.getMyCurrentRequest().getRequestedCmd();
-            requestedCommand.executeReceivingCmd();
             if(requestedCommand.getCommandType() == CommandType.Client) {
                 ((ClientCommand)requestedCommand).executeInCS();
+            } else if(requestedCommand.getCommandType() == CommandType.Server) {
+                requestedCommand.executeReceivingCmd();
             }
         }
     }

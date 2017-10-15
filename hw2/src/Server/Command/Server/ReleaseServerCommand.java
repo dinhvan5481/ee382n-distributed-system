@@ -1,9 +1,13 @@
 package Server.Command.Server;
 
+import Server.Command.Client.ClientCommand;
+import Server.Command.Command;
+import Server.Core.ServerInfo;
 import Server.Core.ServerRequest;
 import Server.Synchronize.ServerSynchronizer;
 
 import java.util.LinkedList;
+import java.util.StringJoiner;
 
 public class ReleaseServerCommand extends ServerCommand {
 
@@ -15,7 +19,27 @@ public class ReleaseServerCommand extends ServerCommand {
 
     @Override
     public void executeReceiving() {
-        synchronizer.getLogicalClock().tick(sendingServerClockValue);
-
+        if(synchronizer.getMyState() == ServerInfo.ServerState.READY) {
+            if(additionalInfos.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                additionalInfos.forEach(token -> sb.append(token + " "));
+                sb.setLength(sb.length() - 1);
+                Command releaseCmd = Command.parseCommand(sb.toString(), synchronizer);
+                if(releaseCmd.getCommandType() == CommandType.Client) {
+                    ((ClientCommand)releaseCmd).executeWhenInCS();
+                }
+            }
+            synchronizer.removeMinRequestFromServer(sendingServerid);
+            ServerRequest request = synchronizer.getMinRequest();
+            if(request == null) {
+                return;
+            }
+            if(request.isMine(synchronizer.getId())) {
+                Command requestedCmd = request.getRequestedCmd();
+                if(requestedCmd != null) {
+                    requestedCmd.executeReceivingCmd();
+                }
+            }
+        }
     }
 }

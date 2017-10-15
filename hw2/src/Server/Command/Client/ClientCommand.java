@@ -40,7 +40,7 @@ public abstract class ClientCommand extends Command {
         this.tcpConnection = tcpConnection;
     }
 
-    protected abstract String executeWhenInCS();
+    public abstract String executeWhenInCS();
 
 
 

@@ -71,7 +71,7 @@ public class BookKeeper {
         if (reservationsFound.iterator().hasNext()) {
             int reservationFound = reservationsFound.iterator().next();
             if (reservationsFound.iterator().hasNext()) {
-                System.err.println("A user should not be allowed to have more than 1 reservation.");
+                //System.err.println("A user should not be allowed to have more than 1 reservation.");
             }
             return reservationFound;
         }

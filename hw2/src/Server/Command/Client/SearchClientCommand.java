@@ -12,7 +12,7 @@ public class SearchClientCommand extends ClientCommand {
     }
 
     @Override
-    protected String executeWhenInCS() {
+    public String executeWhenInCS() {
         String name;
         String response;
         if (tokens.length != 2) {
