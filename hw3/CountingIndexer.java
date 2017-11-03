@@ -11,6 +11,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -83,56 +85,74 @@ public class CountingIndexer extends Configured implements Tool {
     }
 
 
-    private double readAndReport(Path path, Configuration conf)
+    private void readAndReport(Path path, Configuration conf)
         throws IOException {
         
         FileSystem fs = FileSystem.get(conf);
-        Path file = new Path(path, "part-r-00000");
-
-        if (!fs.exists(file))
-          throw new IOException("Output not found!");
-
-        BufferedReader br = null;
-        HashMap<String, HashMap<String, Integer>> countIndex = new HashMap<>();
-
-        try {
-	        br = new BufferedReader(new InputStreamReader(fs.open(file), Charsets.UTF_8));
-	        String[] word_chapter = null;
-	        long count = -1;
-
-	        String line;
-	        while ((line = br.readLine()) != null) {
-	            System.out.println(line);
-		        StringTokenizer st = new StringTokenizer(line);
-
-                word_chapter = st.nextToken().split(":");			
-		        count = Long.parseLong(st.nextToken());
-
-                HashMap<String, Integer> chapters = countIndex.get(word_chapter[0]);
-                if (chapters == null) {
-                    chapters = new HashMap<String, Integer>();
-                    countIndex.put(word_chapter[0], chapters);
-                }
-                
-                Integer chapterCount = chapters.get(word_chapter[1]);
-                if (chapterCount == null) {
-                    chapterCount = new Integer(0);
-                }
-                
-                chapters.put(word_chapter[1], new Integer(chapterCount.intValue() + (int)count));
-                word_chapter = null;
-                count = -1;
-	        }
-	
-	        printCountIndex(countIndex);
-	
-
-	        return 0;
-        } finally {
-	        if (br != null) {
-		        br.close();
-	        }
+        if (!fs.exists(path)) {
+            throw new IOException("Path not found");
         }
+        
+        HashMap<String, HashMap<String, Integer>> countIndex = new HashMap<>();
+        ArrayList<Path> fileList = findReducedFiles(fs, path);
+        
+        for (Path file : fileList) {
+            if (!fs.exists(file))
+              throw new IOException("Output not found!");
+
+            BufferedReader br = null;
+
+
+            try {
+	            br = new BufferedReader(new InputStreamReader(fs.open(file), Charsets.UTF_8));
+	            String[] word_chapter = null;
+	            long count = -1;
+
+	            String line;
+	            while ((line = br.readLine()) != null) {
+	                System.out.println(line);
+		            StringTokenizer st = new StringTokenizer(line);
+
+                    word_chapter = st.nextToken().split(":");			
+		            count = Long.parseLong(st.nextToken());
+
+                    HashMap<String, Integer> chapters = countIndex.get(word_chapter[0]);
+                    if (chapters == null) {
+                        chapters = new HashMap<String, Integer>();
+                        countIndex.put(word_chapter[0], chapters);
+                    }
+                    
+                    Integer chapterCount = chapters.get(word_chapter[1]);
+                    if (chapterCount == null) {
+                        chapterCount = new Integer(0);
+                    }
+                    
+                    chapters.put(word_chapter[1], new Integer(chapterCount.intValue() + (int)count));
+                    word_chapter = null;
+                    count = -1;
+	            }
+	
+	            printCountIndex(countIndex);
+	
+            } finally {
+	            if (br != null) {
+		            br.close();
+	            }
+            }
+        }
+    }
+    
+    private ArrayList<Path> findReducedFiles(FileSystem fs, Path path)
+        throws IOException {
+        
+        ArrayList<Path> fileList = new ArrayList<>();
+        RemoteIterator<LocatedFileStatus> filesIterator = fs.listFiles(path, false);
+        
+        while(filesIterator.hasNext()) {
+            fileList.add(filesIterator.next().getPath());
+        }
+    
+        return fileList;
     }
   
     public static class ChapterComparator implements Comparator<Map.Entry<String, Integer>> {
@@ -192,12 +212,8 @@ public class CountingIndexer extends Configured implements Tool {
         Path outputpath = new Path(args[1]);
         FileOutputFormat.setOutputPath(job, outputpath);
         boolean result = job.waitForCompletion(true);
-        mean = readAndReport(outputpath, conf);
+        readAndReport(outputpath, conf);
 
         return (result ? 0 : 1);
-    }
-
-    public double getMean() {
-        return mean;
     }
 }
