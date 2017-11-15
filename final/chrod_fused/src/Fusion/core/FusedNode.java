@@ -5,11 +5,13 @@ import java.util.List;
 
 public class FusedNode<T> {
     private List<AuxNodeFusedBackupServer> auxNodes;
+    private int key;
     private T value;
     private int numOfPrimaryServer;
     private int refCount;
 
-    public FusedNode(int numOfPrimaryServer) {
+    public FusedNode(int numOfPrimaryServer,int key) {
+        this.key = key;
         auxNodes = new ArrayList<AuxNodeFusedBackupServer>(numOfPrimaryServer);
         this.numOfPrimaryServer = numOfPrimaryServer;
         refCount = 0;
@@ -38,5 +40,20 @@ public class FusedNode<T> {
 
     public int getRefCount() {
         return refCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return key;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof FusedNode<?>) {
+            if(((FusedNode<?>)obj).key == this.key) {
+                return true;
+            }
+        }
+        return false;
     }
 }
