@@ -14,4 +14,8 @@ public class AuxNodePrimaryServer {
     public PrimaryNode getPrimaryNode() {
         return primaryNode;
     }
+
+    public void setPrimaryNode(PrimaryNode primaryNode) {
+        this.primaryNode = primaryNode;
+    }
 }

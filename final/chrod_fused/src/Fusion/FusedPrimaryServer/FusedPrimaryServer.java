@@ -31,7 +31,24 @@ public class FusedPrimaryServer {
             primaryNode.setAuxNode(auxNode);
             auxNodes.add(auxNode);
         }
-        send(serverId, key, value, oldValue);
+        send(key, oldValue, value);
+    }
+
+    public void delete(int key) {
+        PrimaryNode deleteingNode = getPrimaryNodeWithKey(key);
+        if(deleteingNode == null) {
+            return;
+        }
+        int oldValue = deleteingNode.getValue();
+        AuxNodePrimaryServer auxTailNode = auxNodes.getLast();
+        int tosValue = auxTailNode.getPrimaryNode().getValue();
+
+        sendDelete(key, oldValue, tosValue);
+        AuxNodePrimaryServer deletingAuxNode = deleteingNode.getAuxNode();
+        deletingAuxNode.setPrimaryNode(auxTailNode.getPrimaryNode());
+        //Remove reference of primary node so that GC can collect aux node
+        auxTailNode.setPrimaryNode(null);
+        auxNodes.remove(auxTailNode);
     }
 
     private PrimaryNode getPrimaryNodeWithKey(int key) {
@@ -43,7 +60,10 @@ public class FusedPrimaryServer {
         }
     }
 
-    private void send(int serverId, int key, int newValue, int oldValue) {
+    private void send(int key, int oldValue, int newValue) {
+        return;
+    }
+    private void sendDelete(int key, int oldValue, int newValue) {
         return;
     }
 }
