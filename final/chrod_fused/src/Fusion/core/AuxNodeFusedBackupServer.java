@@ -1,26 +1,38 @@
 package Fusion.core;
 
 public class AuxNodeFusedBackupServer {
-    FusedNode fusedNode;
+    private int serverId;
+    private int key;
+    private FusedNode fusedNode;
 
     private AuxNodeFusedBackupServer() {}
-    public AuxNodeFusedBackupServer(FusedNode fusedNode) {
-        this.fusedNode = fusedNode;
+    public AuxNodeFusedBackupServer(int serverId, int key) {
+        this.serverId = serverId;
+        this.key = key;
     }
 
     public FusedNode getFusedNode() {
         return fusedNode;
     }
 
+    public void setFusedNode(FusedNode fusedNode) {
+        this.fusedNode = fusedNode;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
     @Override
     public int hashCode() {
-        return fusedNode.hashCode();
+        return serverId + serverId;
     }
 
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof AuxNodeFusedBackupServer) {
-            if(((AuxNodeFusedBackupServer)obj).fusedNode.equals(this.fusedNode)) {
+            AuxNodeFusedBackupServer obj2 = (AuxNodeFusedBackupServer)obj;
+            if(this.serverId == obj2.serverId && this.key == obj2.key) {
                 return true;
             }
         }
