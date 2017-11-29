@@ -51,16 +51,6 @@ public class FusedBackupServer<T> {
         }
     }
 
-    private AuxNodeFusedBackupServer checkAuxListContainsKey(LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList, final int key) {
-        Optional<AuxNodeFusedBackupServer> resultOpt = auxNodeFusedBackupServerLinkedList.stream().filter(auxNode -> auxNode.getKey() == key)
-                .findFirst();
-        if(resultOpt.isPresent()) {
-            return resultOpt.get();
-        } else {
-            return null;
-        }
-    }
-
     public void delete(int serverId, int key, T deleteValue, T endValue) {
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         AuxNodeFusedBackupServer auxNodeFusedBackupServer = checkAuxListContainsKey(auxNodeFusedBackupServerLinkedList, key);
@@ -93,5 +83,16 @@ public class FusedBackupServer<T> {
             dataStackTOS = new AtomicInteger(0);
         }
         return dataStackTOS;
+    }
+
+
+    private AuxNodeFusedBackupServer checkAuxListContainsKey(LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList, final int key) {
+        Optional<AuxNodeFusedBackupServer> resultOpt = auxNodeFusedBackupServerLinkedList.stream().filter(auxNode -> auxNode.getKey() == key)
+                .findFirst();
+        if(resultOpt.isPresent()) {
+            return resultOpt.get();
+        } else {
+            return null;
+        }
     }
 }
