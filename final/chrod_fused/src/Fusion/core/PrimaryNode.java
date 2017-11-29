@@ -1,21 +1,22 @@
 package Fusion.core;
 
-public class PrimaryNode<T> {
+public class PrimaryNode {
     private int key;
-    private T value;
+    private int value;
     private AuxNodePrimaryServer auxNode;
 
     private PrimaryNode(){}
-    public PrimaryNode(int key, T value) {
+
+    public PrimaryNode(int key, int value) {
         this.key = key;
         this.value = value;
     }
 
-    public T getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(int value) {
         this.value = value;
     }
 
@@ -25,5 +26,9 @@ public class PrimaryNode<T> {
 
     public void setAuxNode(AuxNodePrimaryServer auxNode) {
         this.auxNode = auxNode;
+    }
+
+    public int getKey() {
+        return key;
     }
 }

@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FusedBackupServer<T> {
+public class FusedBackupServer {
     private ArrayList<LinkedList<AuxNodeFusedBackupServer>> auxLinkedList;
-    private ArrayList<FusedNode<T>> dataStack;
+    private ArrayList<FusedNode> dataStack;
     private int numOfPrimaryServer;
     private AtomicInteger[] tos;
     private AtomicInteger dataStackTOS;
@@ -22,25 +22,25 @@ public class FusedBackupServer<T> {
         this.numOfPrimaryServer = numberOfPrimaryServer;
         tos = new AtomicInteger[numberOfPrimaryServer];
         this.auxLinkedList = new ArrayList<LinkedList<AuxNodeFusedBackupServer>>(numberOfPrimaryServer);
-        this.dataStack = new ArrayList<FusedNode<T>>();
+        this.dataStack = new ArrayList<FusedNode>();
         for (int i = 0; i < numberOfPrimaryServer; i++) {
             auxLinkedList.set(i, new LinkedList<AuxNodeFusedBackupServer>());
         }
     }
 
-    public void upsert(int serverId, int key, T newValue, T oldValue) {
+    public void upsert(int serverId, int key, int newValue, int oldValue) {
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         AuxNodeFusedBackupServer auxNodeFusedBackupServer = checkAuxListContainsKey(auxNodeFusedBackupServerLinkedList, key);
         if(auxNodeFusedBackupServer != null) {
-            FusedNode<T> existedFusedNode = auxNodeFusedBackupServer.getFusedNode();
+            FusedNode existedFusedNode = auxNodeFusedBackupServer.getFusedNode();
             existedFusedNode.updateCode(oldValue, newValue);
         } else {
-            FusedNode<T> fusedNode = null;
+            FusedNode fusedNode = null;
             int tosAuxList = getTOSOf(serverId).incrementAndGet();
             if(tosAuxList < dataStack.size()) {
                 fusedNode = dataStack.get(tosAuxList);
             } else {
-                fusedNode = new FusedNode<T>(numOfPrimaryServer);
+                fusedNode = new FusedNode(numOfPrimaryServer);
                 dataStack.add(fusedNode);
             }
             fusedNode.updateCode(oldValue, newValue);
@@ -51,7 +51,7 @@ public class FusedBackupServer<T> {
         }
     }
 
-    public void delete(int serverId, int key, T deleteValue, T endValue) {
+    public void delete(int serverId, int key, int deleteValue, int endValue) {
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         AuxNodeFusedBackupServer auxNodeFusedBackupServer = checkAuxListContainsKey(auxNodeFusedBackupServerLinkedList, key);
         if(auxNodeFusedBackupServer == null) {
@@ -67,8 +67,6 @@ public class FusedBackupServer<T> {
         if(tosFusedNode.isFusedEmpty()) {
             dataStack.remove(dataStack.size() - 1);
         }
-
-
     }
 
     private AtomicInteger getTOSOf(int serverId) {

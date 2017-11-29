@@ -3,19 +3,19 @@ package Fusion.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FusedNode<T> {
-    private List<AuxNodeFusedBackupServer> auxNodes;
-    private T value;
-    private int numOfPrimaryServer;
-    private int refCount;
+public class FusedNode {
+    protected List<AuxNodeFusedBackupServer> auxNodes;
+    protected int value;
+    protected int numOfPrimaryServer;
+    protected int refCount;
 
     public FusedNode(int numOfPrimaryServer) {
-        auxNodes = new ArrayList<AuxNodeFusedBackupServer>(numOfPrimaryServer);
+        auxNodes = new ArrayList<>(numOfPrimaryServer);
         this.numOfPrimaryServer = numOfPrimaryServer;
         refCount = 0;
     }
 
-    public void updateCode(T oldValue, T newValue) {
+    public void updateCode(int oldValue, int newValue) {
         // TODO: added RS code here
         this.value = newValue;
     }
