@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FusedNode {
-    protected List<AuxNodeFusedBackupServer> auxNodes;
+    protected AuxNodeFusedBackupServer[] auxNodes;
     protected int value;
     protected int numOfPrimaryServer;
     protected int refCount;
 
     public FusedNode(int numOfPrimaryServer) {
-        auxNodes = new ArrayList<>(numOfPrimaryServer);
+        auxNodes = new AuxNodeFusedBackupServer[numOfPrimaryServer];
         this.numOfPrimaryServer = numOfPrimaryServer;
         refCount = 0;
     }
@@ -21,11 +21,11 @@ public class FusedNode {
     }
 
     public void setAuxNode(int serverId, AuxNodeFusedBackupServer auxNode) {
-        auxNodes.set(serverId, auxNode);
+        auxNodes[serverId] = auxNode;
     }
 
     public AuxNodeFusedBackupServer getAuxNode(int serverId) {
-        return  auxNodes.get(serverId);
+        return  auxNodes[serverId];
     }
 
     public void increaseRefCount() {

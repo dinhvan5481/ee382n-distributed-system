@@ -25,7 +25,7 @@ public class AuxNodeFusedBackupServer {
 
     @Override
     public int hashCode() {
-        return serverId + serverId;
+        return serverId + key;
     }
 
     @Override
