@@ -59,13 +59,13 @@ public final class PropertiesLoader {
 	 * Name of property which has to be set for loading a specific property
 	 * file.
 	 */
-	public final static String PROPERTY_WHERE_TO_FIND_PROPERTY_FILE = "chord.properties.file";
+	public final static String PROPERTY_WHERE_TO_FIND_PROPERTY_FILE = "./config/chord.properties";
 
 	/**
 	 * File name of property file which is loaded, if no other file is
 	 * specified.
 	 */
-	public final static String STANDARD_PROPERTY_FILE = "chord.properties";
+	public final static String STANDARD_PROPERTY_FILE = "./config/chord.properties";
 
 	/**
 	 * Reads the properties from property file. Either uses the standard

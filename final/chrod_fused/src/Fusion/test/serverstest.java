@@ -1,15 +1,21 @@
 package Fusion.test;
 
 import Fusion.FusedBackupServer.FusedBackupServer;
+import com.sun.tools.corba.se.idl.InvalidArgument;
 
 import java.io.Console;
+import java.util.LinkedList;
 
 public class serverstest {
 
     public FusedBackupServer fusedBackupServer;
 
     public serverstest(int numOfServers) {
-        fusedBackupServer = new FusedBackupServer(numOfServers);
+        try {
+            fusedBackupServer = new FusedBackupServer(numOfServers, new LinkedList<>());
+        } catch (InvalidArgument invalidArgument) {
+            invalidArgument.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
