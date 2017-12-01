@@ -16,8 +16,11 @@ public class FusedNode {
     }
 
     public void updateCode(int oldValue, int newValue) {
-        // TODO: added RS code here
-        this.value = newValue;
+        this.value += newValue - oldValue;
+    }
+
+    public int getValue() {
+        return value;
     }
 
     public void setAuxNode(int serverId, AuxNodeFusedBackupServer auxNode) {

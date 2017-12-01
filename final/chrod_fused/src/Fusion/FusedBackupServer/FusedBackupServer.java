@@ -2,23 +2,27 @@ package Fusion.FusedBackupServer;
 
 import Fusion.core.AuxNodeFusedBackupServer;
 import Fusion.core.FusedNode;
+import com.sun.tools.corba.se.idl.InvalidArgument;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class FusedBackupServer {
     private ArrayList<LinkedList<AuxNodeFusedBackupServer>> auxLinkedList;
     private ArrayList<FusedNode> dataStack;
+    private List<Integer> coeff;
     private int numOfPrimaryServer;
     private AtomicInteger[] tos;
     private AtomicInteger dataStackTOS;
 
     private FusedBackupServer(){}
 
-    public FusedBackupServer(int numberOfPrimaryServer) {
+    public FusedBackupServer(int numberOfPrimaryServer, List<Integer> coEfficient) throws InvalidArgument {
+        if(coEfficient == null || coEfficient.size() != numberOfPrimaryServer) {
+            throw new InvalidArgument("Number of servers doesn't match with number of coeeficience");
+        }
+        this.coeff = coEfficient;
         this.numOfPrimaryServer = numberOfPrimaryServer;
         tos = new AtomicInteger[numberOfPrimaryServer];
         this.auxLinkedList = new ArrayList<>(numberOfPrimaryServer);
@@ -29,6 +33,8 @@ public class FusedBackupServer {
     }
 
     public void upsert(int serverId, int key, int newValue, int oldValue) {
+        newValue = mapInputValueWithCoeff(serverId, newValue);
+        oldValue = mapInputValueWithCoeff(serverId, oldValue);
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         AuxNodeFusedBackupServer auxNodeFusedBackupServer = checkAuxListContainsKey(auxNodeFusedBackupServerLinkedList, key);
         if(auxNodeFusedBackupServer != null) {
@@ -53,6 +59,8 @@ public class FusedBackupServer {
     }
 
     public void delete(int serverId, int key, int deleteValue, int endValue) {
+        deleteValue = mapInputValueWithCoeff(serverId, deleteValue);
+        endValue = mapInputValueWithCoeff(serverId, endValue);
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         AuxNodeFusedBackupServer auxNodeFusedBackupServer = checkAuxListContainsKey(auxNodeFusedBackupServerLinkedList, key);
         if(auxNodeFusedBackupServer == null || getCurrentValueOfTOS(serverId) < 0) {
@@ -69,6 +77,12 @@ public class FusedBackupServer {
             dataStack.remove(dataStack.size() - 1);
         }
         tos[serverId].decrementAndGet();
+    }
+
+    public List<Integer> retrieveFusedLinkedList(int serverId) {
+        LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
+        return auxNodeFusedBackupServerLinkedList.stream().sorted(Comparator.comparingInt(AuxNodeFusedBackupServer::getKey))
+                .map(auxNode -> auxNode.getFusedNode().getValue()).collect(Collectors.toList());
     }
 
     private int getTOSOf(int serverId) {
@@ -109,5 +123,9 @@ public class FusedBackupServer {
         } else {
             return null;
         }
+    }
+
+    private int mapInputValueWithCoeff(int serverId, int value) {
+        return coeff.get(serverId) * value;
     }
 }

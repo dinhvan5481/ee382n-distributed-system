@@ -1,22 +1,25 @@
 package Fusion.FusedPrimaryServer;
 
-import Fusion.core.AuxNodeFusedBackupServer;
+import Fusion.communication.RMIAgent;
 import Fusion.core.AuxNodePrimaryServer;
 import Fusion.core.PrimaryNode;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 public class FusedPrimaryServer {
     private int serverId;
     private LinkedList<AuxNodePrimaryServer> auxNodes;
     private LinkedList<PrimaryNode> primaryLinkedList;
+    private RMIAgent rmiAgent;
 
     private FusedPrimaryServer() {}
-    public FusedPrimaryServer(int serverId) {
+    public FusedPrimaryServer(int serverId, RMIAgent rmiAgent) {
         this.serverId = serverId;
         auxNodes = new LinkedList<>();
         primaryLinkedList = new LinkedList<>();
+        this.rmiAgent = rmiAgent;
     }
 
     public void upsert(int key, int value) {
@@ -31,7 +34,7 @@ public class FusedPrimaryServer {
             primaryNode.setAuxNode(auxNode);
             auxNodes.add(auxNode);
         }
-        send(key, oldValue, value);
+        send(key, value, oldValue);
     }
 
     public void delete(int key) {
@@ -51,6 +54,10 @@ public class FusedPrimaryServer {
         auxNodes.remove(auxTailNode);
     }
 
+    public List<Integer> getFusedLinkedList(int serverId) {
+        return null;
+    }
+
     private PrimaryNode getPrimaryNodeWithKey(int key) {
         Optional<PrimaryNode> resultOpt = primaryLinkedList.stream().filter(primaryNode -> primaryNode.getKey() == key).findFirst();
         if(resultOpt.isPresent()) {
@@ -60,10 +67,12 @@ public class FusedPrimaryServer {
         }
     }
 
-    private void send(int key, int oldValue, int newValue) {
-        return;
+    private void send(int key, int newValue, int oldValue) {
+        rmiAgent.broadcastUpsert(serverId, key, newValue, oldValue);
     }
-    private void sendDelete(int key, int oldValue, int newValue) {
-        return;
+
+
+    private void sendDelete(int key, int oldValue, int tosValue) {
+        rmiAgent.broadcastDelete(serverId, key, oldValue, tosValue);
     }
 }
