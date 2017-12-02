@@ -33,6 +33,7 @@ public class FusedPrimaryServer {
             AuxNodePrimaryServer auxNode = new AuxNodePrimaryServer(primaryNode);
             primaryNode.setAuxNode(auxNode);
             auxNodes.add(auxNode);
+            primaryLinkedList.add(primaryNode);
         }
         send(key, value, oldValue);
     }
