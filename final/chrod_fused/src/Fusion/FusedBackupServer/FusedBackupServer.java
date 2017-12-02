@@ -32,7 +32,7 @@ public class FusedBackupServer {
         }
     }
 
-    public void upsert(int serverId, int key, int newValue, int oldValue) {
+    public synchronized void upsert(int serverId, int key, int newValue, int oldValue) {
         newValue = mapInputValueWithCoeff(serverId, newValue);
         oldValue = mapInputValueWithCoeff(serverId, oldValue);
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
@@ -58,7 +58,7 @@ public class FusedBackupServer {
         }
     }
 
-    public void delete(int serverId, int key, int deleteValue, int endValue) {
+    public synchronized void delete(int serverId, int key, int deleteValue, int endValue) {
         deleteValue = mapInputValueWithCoeff(serverId, deleteValue);
         endValue = mapInputValueWithCoeff(serverId, endValue);
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
@@ -79,7 +79,7 @@ public class FusedBackupServer {
         tos[serverId].decrementAndGet();
     }
 
-    public List<Integer> retrieveFusedLinkedList(int serverId) {
+    public synchronized List<Integer> retrieveFusedLinkedList(int serverId) {
         LinkedList<AuxNodeFusedBackupServer> auxNodeFusedBackupServerLinkedList = auxLinkedList.get(serverId);
         return auxNodeFusedBackupServerLinkedList.stream().sorted(Comparator.comparingInt(AuxNodeFusedBackupServer::getKey))
                 .map(auxNode -> auxNode.getFusedNode().getValue()).collect(Collectors.toList());

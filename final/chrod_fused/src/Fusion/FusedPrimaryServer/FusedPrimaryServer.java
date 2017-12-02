@@ -4,6 +4,7 @@ import Fusion.communication.RMIAgent;
 import Fusion.core.AuxNodePrimaryServer;
 import Fusion.core.PrimaryNode;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -55,8 +56,20 @@ public class FusedPrimaryServer {
         auxNodes.remove(auxTailNode);
     }
 
-    public List<Integer> getFusedLinkedList(int serverId) {
-        return null;
+    public List<Integer> recoverValue() {
+        List<Integer> results = new LinkedList<>();
+        HashMap<String, List<Integer>> fromBackupServer = rmiAgent.broadcastRecoverValue(serverId);
+        int resultSize = fromBackupServer.get("b1").size();
+        if(serverId == 0) {
+            for (int i = 0; i < resultSize; i++) {
+                results.add((fromBackupServer.get("b1").get(i) + fromBackupServer.get("b2").get(i)) / 2);
+            }
+        } else {
+            for (int i = 0; i < resultSize; i++) {
+                results.add((fromBackupServer.get("b1").get(i) - fromBackupServer.get("b2").get(i)) / 2);
+            }
+        }
+        return results;
     }
 
     private PrimaryNode getPrimaryNodeWithKey(int key) {

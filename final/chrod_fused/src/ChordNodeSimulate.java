@@ -6,4 +6,8 @@ public class ChordNodeSimulate {
         this.key = key;
         this.value = value;
     }
+
+    public int getKey() {
+        return key;
+    }
 }

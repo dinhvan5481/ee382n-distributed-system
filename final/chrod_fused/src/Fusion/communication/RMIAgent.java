@@ -2,6 +2,8 @@ package Fusion.communication;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class RMIAgent {
@@ -41,5 +43,18 @@ public class RMIAgent {
                 e.printStackTrace();
             }
         });
+    }
+
+    public HashMap<String, List<Integer>> broadcastRecoverValue(int serverId) {
+        HashMap<String, List<Integer>> result;
+        result = new HashMap<>();
+        rmiClients.parallelStream().forEach(rmiClient -> {
+            try {
+                result.put(rmiClient.getServerRMIID(), rmiClient.getRMIClient().retrieveAuxList(serverId));
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        });
+        return result;
     }
 }

@@ -6,10 +6,7 @@ import de.uniba.wiai.lspi.chord.service.ServiceException;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 
 import java.net.MalformedURLException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Main {
 
@@ -62,6 +59,9 @@ public class Main {
         List<String> rmiServerIds = new LinkedList<>();
         rmiServerIds.add("b1");
         rmiServerIds.add("b2");
+
+
+
         rmiConnectionLayer1 = new RMIAgent(rmiServerIds);
         rmiConnectionLayer2 = new RMIAgent(rmiServerIds);
         fusedPrimaryServer1 = new FusedPrimaryServer(0, rmiConnectionLayer1);
@@ -79,22 +79,35 @@ public class Main {
             entriesX2.add(entry2);
         }
 
+        Collections.sort(entriesX1, Comparator.comparingInt(ChordNodeSimulate::getKey));
+
         // Simulate for update
         for (int i = 0; i < 50; i++) {
             fusedPrimaryServer1.upsert(entriesX1.get(random.nextInt(entriesX1.size())).key, random.nextInt());
             fusedPrimaryServer2.upsert(entriesX2.get(random.nextInt(entriesX2.size())).key, random.nextInt());
         }
         // Simulate for delete
-        for (int i = 0; i < entriesX1.size() / 10; i++) {
-            fusedPrimaryServer1.delete(entriesX1.get(random.nextInt(entriesX1.size())).key);
-            fusedPrimaryServer2.delete(entriesX2.get(random.nextInt(entriesX2.size())).key);
-        }
-
         // Simulate for retrieve
         for (int i = 0; i < entriesX1.size() / 10; i++) {
-            fusedPrimaryServer1.delete(entriesX1.get(random.nextInt(entriesX1.size())).key);
-            fusedPrimaryServer2.delete(entriesX2.get(random.nextInt(entriesX2.size())).key);
+            int removeIndex1 = random.nextInt(entriesX1.size());
+            int removeIndex2 = random.nextInt(entriesX2.size());
+            int deleteKey1 = entriesX1.get(removeIndex1).key;
+            int deleteKey2 = entriesX1.get(removeIndex2).key;
+            fusedPrimaryServer1.delete(deleteKey1);
+            fusedPrimaryServer2.delete(deleteKey2);
+            entriesX1.remove(removeIndex1);
+            entriesX2.remove(removeIndex2);
         }
 
+        List<Integer> recover = fusedPrimaryServer1.recoverValue();
+        if(recover.size() != entriesX1.size()) {
+            System.out.println("Error: size don't match. Expect: " + entriesX1.size() + " get: " + recover.size());
+        }
+        for (int i = 0; i < recover.size(); i++) {
+            if(entriesX1.get(i).value != recover.get(i).intValue()) {
+                System.out.println("Error: values don't match. Expect: " + entriesX1.get(i).value + " get: " + recover.get(i).intValue());
+                break;
+            }
+        }
     }
 }
