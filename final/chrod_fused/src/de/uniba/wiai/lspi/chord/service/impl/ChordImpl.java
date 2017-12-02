@@ -31,7 +31,9 @@ import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -41,6 +43,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import Fusion.FusedPrimaryServer.FusedPrimaryServer;
+import Fusion.communication.BackupServerRMIClient;
+import Fusion.communication.RMIAgent;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.com.Entry;
 import de.uniba.wiai.lspi.chord.com.Node;
@@ -201,6 +206,10 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 	 * Creates a new instance of ChordImpl which initially is disconnected.
 	 * Constructor is hidden. Only constructor.
 	 */
+	RMIAgent rmiConnectionLayer;
+	FusedPrimaryServer fusedPrimaryServer;
+
+
 	public ChordImpl() {
 		this.logger = Logger.getLogger(ChordImpl.class.getName()
 				+ ".unidentified");
@@ -213,6 +222,15 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 						"AsynchronousExecution"));
 		this.hashFunction = HashFunction.getHashFunction();
 		logger.info("ChordImpl initialized!");
+
+	}
+
+	public void startBackupServer(int backupServerId) {
+		List<String> rmiServerIds = new LinkedList<>();
+		rmiServerIds.add("b1");
+		rmiServerIds.add("b2");
+		rmiConnectionLayer = new RMIAgent(rmiServerIds);
+		fusedPrimaryServer = new FusedPrimaryServer(backupServerId, rmiConnectionLayer);
 	}
 
 	/**

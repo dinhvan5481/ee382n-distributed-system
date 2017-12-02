@@ -17,11 +17,14 @@ public class BackupServerRMIClient {
     }
 
     public void connectToServer() {
+        System.out.println("Try connecting to server " + serverRMIID);
         try {
             stub = (IFusedBackupServerRMI) registry.lookup(serverRMIID + "/fused");
         } catch (RemoteException e) {
+            System.out.println("Fail to connect to server " + serverRMIID);
             e.printStackTrace();
         } catch (NotBoundException e) {
+            System.out.println("Fail to connect to server " + serverRMIID);
             e.printStackTrace();
         }
     }
